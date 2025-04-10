@@ -1,0 +1,21 @@
+# Go 相關
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+trello
+
+# VS Code 除錯檔案
+__debug_bin*
+
+# Go 工作區檔案
+go.work
+
+# 其他常見的暫存檔案
+.DS_Store
+*.log
+tmp/
+temp/

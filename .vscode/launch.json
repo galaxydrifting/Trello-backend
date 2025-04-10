@@ -2,13 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Trello API",
+            "name": "Launch Package",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/main.go",
-            "env": {},
-            "args": []
+            "program": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.devcontainer/.env"
         }
     ]
 }

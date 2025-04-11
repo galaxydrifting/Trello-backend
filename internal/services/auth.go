@@ -5,25 +5,30 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 
 	"trello-backend/internal/models"
+	"trello-backend/internal/repository"
 	"trello-backend/pkg/utils"
 )
 
-type AuthService struct {
-	db        *gorm.DB
+type AuthService interface {
+	Register(req models.RegisterRequest) (string, error)
+	Login(req models.LoginRequest) (string, error)
+}
+
+type authService struct {
+	userRepo  repository.UserRepository
 	jwtSecret string
 }
 
-func NewAuthService(db *gorm.DB, jwtSecret string) *AuthService {
-	return &AuthService{
-		db:        db,
+func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthService {
+	return &authService{
+		userRepo:  userRepo,
 		jwtSecret: jwtSecret,
 	}
 }
 
-func (s *AuthService) Register(req models.RegisterRequest) (string, error) {
+func (s *authService) Register(req models.RegisterRequest) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", errors.New("密碼加密失敗")
@@ -36,16 +41,16 @@ func (s *AuthService) Register(req models.RegisterRequest) (string, error) {
 		PasswordHash: string(hashedPassword),
 	}
 
-	if err := s.db.Create(&user).Error; err != nil {
+	if err := s.userRepo.Create(&user); err != nil {
 		return "", errors.New("使用者建立失敗")
 	}
 
 	return utils.GenerateToken(user.ID, s.jwtSecret)
 }
 
-func (s *AuthService) Login(req models.LoginRequest) (string, error) {
-	var user models.User
-	if err := s.db.Where("email = ?", req.Email).First(&user).Error; err != nil {
+func (s *authService) Login(req models.LoginRequest) (string, error) {
+	user, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
 		return "", errors.New("帳號或密碼錯誤")
 	}
 

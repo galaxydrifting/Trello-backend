@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
 	"trello-backend/internal/models"
 	"trello-backend/internal/services"
@@ -12,13 +11,11 @@ import (
 
 // AuthHandler 處理認證相關的請求
 type AuthHandler struct {
-	db      *gorm.DB
-	authSvc *services.AuthService
+	authSvc services.AuthService
 }
 
-func NewAuthHandler(db *gorm.DB, authSvc *services.AuthService) *AuthHandler {
+func NewAuthHandler(authSvc services.AuthService) *AuthHandler {
 	return &AuthHandler{
-		db:      db,
 		authSvc: authSvc,
 	}
 }

@@ -10,11 +10,10 @@ import (
 	"gorm.io/gorm"
 
 	"trello-backend/docs"
+	"trello-backend/internal/app"
 	"trello-backend/internal/config"
-	"trello-backend/internal/handlers"
 	"trello-backend/internal/middleware"
 	"trello-backend/internal/models"
-	"trello-backend/internal/services"
 )
 
 // @title Trello 後端 API
@@ -50,11 +49,11 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	// 初始化服務
-	authService := services.NewAuthService(db, cfg.JWTSecret)
-
-	// 初始化處理器
-	authHandler := handlers.NewAuthHandler(db, authService)
+	// 使用 wire 進行相依性注入
+	authHandler, err := app.InitializeAPI(db, cfg.JWTSecret)
+	if err != nil {
+		log.Fatal("無法初始化 API:", err)
+	}
 
 	// 設定路由
 	r := gin.Default()

@@ -52,14 +52,22 @@ func main() {
 	setupSwagger()
 
 	// 使用 wire 進行相依性注入
-	handlers, err := app.InitializeHandlers(db, cfg.JWTSecret)
+	authHandler, err := app.InitializeAPI(db, cfg.JWTSecret)
 	if err != nil {
-		log.Fatal("無法初始化 Handlers:", err)
+		log.Fatal("無法初始化 AuthHandler:", err)
 	}
 
 	// 設定路由
 	engine := gin.Default()
-	router := routes.NewRouter(engine, handlers, cfg.JWTSecret)
+	router := routes.NewRouter(engine, cfg.JWTSecret)
+
+	// 註冊 handlers
+	router.RegisterHandler("auth", authHandler)
+	// 當有新的 handler 時，只需要註冊即可，不需要修改 Router 的結構
+	// router.RegisterHandler("board", boardHandler)
+	// router.RegisterHandler("card", cardHandler)
+	// ...
+
 	router.SetupRoutes()
 
 	// 啟動伺服器

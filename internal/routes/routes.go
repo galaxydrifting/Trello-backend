@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"trello-backend/internal/handlers"
 	"trello-backend/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -11,16 +10,21 @@ import (
 
 type Router struct {
 	engine    *gin.Engine
-	handlers  *handlers.Handlers
+	handlers  map[string]interface{}
 	jwtSecret string
 }
 
-func NewRouter(engine *gin.Engine, handlers *handlers.Handlers, jwtSecret string) *Router {
+func NewRouter(engine *gin.Engine, jwtSecret string) *Router {
 	return &Router{
 		engine:    engine,
-		handlers:  handlers,
+		handlers:  make(map[string]interface{}),
 		jwtSecret: jwtSecret,
 	}
+}
+
+// RegisterHandler 註冊新的 handler
+func (r *Router) RegisterHandler(name string, handler interface{}) {
+	r.handlers[name] = handler
 }
 
 func (r *Router) SetupRoutes() {
@@ -35,13 +39,4 @@ func (r *Router) SetupRoutes() {
 	api.Use(middleware.AuthMiddleware(r.jwtSecret))
 
 	// TODO: 在這裡加入其他 API 路由群組
-	// r.setupBoardRoutes(api)
-	// r.setupCardRoutes(api)
-	// r.setupListRoutes(api)
-	// r.setupCommentRoutes(api)
-	// r.setupUserRoutes(api)
-	// r.setupWorkspaceRoutes(api)
-	// r.setupActivityRoutes(api)
-	// r.setupLabelRoutes(api)
-	// r.setupAttachmentRoutes(api)
 }

@@ -24,19 +24,12 @@ func InitializeAPI(db *gorm.DB, jwtSecret string) (*handlers.AuthHandler, error)
 	return authHandler, nil
 }
 
-// 初始化所有 handlers
-func InitializeHandlers(db *gorm.DB, jwtSecret string) (*handlers.Handlers, error) {
-	userRepository := postgres.NewUserRepository(db)
-	authService := services.NewAuthService(userRepository, jwtSecret)
-	authHandler := handlers.NewAuthHandler(authService)
-	handlersHandlers := handlers.NewHandlers(authHandler)
-	return handlersHandlers, nil
-}
-
 // wire.go:
 
-var userRepositorySet = wire.NewSet(postgres.NewUserRepository)
+// 使用者領域的 Provider Set
+var userDomainSet = wire.NewSet(postgres.NewUserRepository, services.NewAuthService, handlers.NewAuthHandler)
 
-var serviceSet = wire.NewSet(services.NewAuthService)
-
-var handlerSet = wire.NewSet(handlers.NewAuthHandler)
+// 所有領域的 Provider Set 組合
+var allDomainsSet = wire.NewSet(
+	userDomainSet,
+)

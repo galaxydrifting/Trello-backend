@@ -1,0 +1,111 @@
+basePath: /
+definitions:
+  models.APIResponse:
+    properties:
+      error:
+        example: 錯誤訊息
+        type: string
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      name:
+        example: 王小明
+        type: string
+      password:
+        example: password123
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Trello 後端 API 文件
+  title: Trello Backend API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: 使用電子郵件和密碼登入並返回 JWT 令牌
+      parameters:
+      - description: 登入資訊
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登入成功
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: 無效的請求資料
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 帳號或密碼錯誤
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: 使用者登入
+      tags:
+      - 認證
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: 註冊新使用者並返回 JWT 令牌
+      parameters:
+      - description: 註冊資訊
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 註冊成功
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: 無效的請求資料
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "500":
+          description: 內部伺服器錯誤
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: 使用者註冊
+      tags:
+      - 認證
+swagger: "2.0"

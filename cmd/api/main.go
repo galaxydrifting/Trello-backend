@@ -4,16 +4,14 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"trello-backend/docs"
 	"trello-backend/internal/app"
 	"trello-backend/internal/config"
-	"trello-backend/internal/middleware"
 	"trello-backend/internal/models"
+	"trello-backend/internal/routes"
 )
 
 // @title Trello 後端 API
@@ -37,40 +35,35 @@ func initDB(cfg *config.Config) *gorm.DB {
 	return db
 }
 
-func main() {
-	cfg := config.LoadConfig()
-	db := initDB(cfg)
-
-	// 初始化 Swagger 文件
+func setupSwagger() {
 	docs.SwaggerInfo.Title = "Trello 後端 API"
 	docs.SwaggerInfo.Description = "Trello 後端 API 文件"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http"}
+}
+
+func main() {
+	cfg := config.LoadConfig()
+	db := initDB(cfg)
+
+	// 初始化 Swagger 文件
+	setupSwagger()
 
 	// 使用 wire 進行相依性注入
-	authHandler, err := app.InitializeAPI(db, cfg.JWTSecret)
+	handlers, err := app.InitializeHandlers(db, cfg.JWTSecret)
 	if err != nil {
-		log.Fatal("無法初始化 API:", err)
+		log.Fatal("無法初始化 Handlers:", err)
 	}
 
 	// 設定路由
-	r := gin.Default()
-
-	// Swagger 文件路由
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// 公開路由
-	r.POST("/register", authHandler.Register)
-	r.POST("/login", authHandler.Login)
-
-	// 需要認證的路由
-	auth := r.Group("/api")
-	auth.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+	engine := gin.Default()
+	router := routes.NewRouter(engine, handlers, cfg.JWTSecret)
+	router.SetupRoutes()
 
 	// 啟動伺服器
-	if err := r.Run(":8080"); err != nil {
+	if err := engine.Run(":8080"); err != nil {
 		log.Fatal("伺服器啟動失敗:", err)
 	}
 }

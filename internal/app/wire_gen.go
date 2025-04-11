@@ -24,6 +24,15 @@ func InitializeAPI(db *gorm.DB, jwtSecret string) (*handlers.AuthHandler, error)
 	return authHandler, nil
 }
 
+// 初始化所有 handlers
+func InitializeHandlers(db *gorm.DB, jwtSecret string) (*handlers.Handlers, error) {
+	userRepository := postgres.NewUserRepository(db)
+	authService := services.NewAuthService(userRepository, jwtSecret)
+	authHandler := handlers.NewAuthHandler(authService)
+	handlersHandlers := handlers.NewHandlers(authHandler)
+	return handlersHandlers, nil
+}
+
 // wire.go:
 
 var userRepositorySet = wire.NewSet(postgres.NewUserRepository)

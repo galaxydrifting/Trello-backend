@@ -22,7 +22,6 @@ go.work
 go.work.sum
 
 # env file
-.env
 .devcontainer/.env
 
 # VS Code 除錯檔案

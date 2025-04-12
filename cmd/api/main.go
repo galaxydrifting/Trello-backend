@@ -62,7 +62,7 @@ func main() {
 
 	// 設定路由
 	engine := gin.Default()
-	router := routes.NewRouter(engine, cfg.JWTSecret)
+	router := routes.NewRouter(engine, cfg.JWTSecret, cfg)
 
 	// 註冊所有 handlers
 	for name, handler := range api.GetHandlers() {

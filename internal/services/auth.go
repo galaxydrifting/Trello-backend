@@ -14,6 +14,7 @@ import (
 type AuthService interface {
 	Register(req models.RegisterRequest) (string, error)
 	Login(req models.LoginRequest) (string, error)
+	ChangePassword(userID uuid.UUID, req models.ChangePasswordRequest) error
 }
 
 type authService struct {
@@ -59,4 +60,22 @@ func (s *authService) Login(req models.LoginRequest) (string, error) {
 	}
 
 	return utils.GenerateToken(user.ID, s.jwtSecret)
+}
+
+func (s *authService) ChangePassword(userID uuid.UUID, req models.ChangePasswordRequest) error {
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return errors.New("使用者不存在")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.OldPassword)); err != nil {
+		return errors.New("舊密碼錯誤")
+	}
+
+	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("密碼加密失敗")
+	}
+
+	return s.userRepo.UpdatePassword(userID, string(newHashedPassword))
 }

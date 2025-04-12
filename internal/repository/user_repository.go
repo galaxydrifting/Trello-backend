@@ -11,6 +11,7 @@ type UserRepository interface {
 	Create(user *models.User) error
 	FindByEmail(email string) (*models.User, error)
 	FindByID(id uuid.UUID) (*models.User, error)
+	UpdatePassword(id uuid.UUID, newPasswordHash string) error
 }
 
 type userRepository struct {
@@ -41,4 +42,8 @@ func (r *userRepository) FindByID(id uuid.UUID) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) UpdatePassword(id uuid.UUID, newPasswordHash string) error {
+	return r.db.Model(&models.User{}).Where("id = ?", id).Update("password_hash", newPasswordHash).Error
 }

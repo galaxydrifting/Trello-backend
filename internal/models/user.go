@@ -36,3 +36,9 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
 }
+
+// ChangePasswordRequest 變更密碼請求
+type ChangePasswordRequest struct {
+	OldPassword string `json:"old_password" binding:"required" example:"oldpass123"`
+	NewPassword string `json:"new_password" binding:"required" example:"newpass123"`
+}

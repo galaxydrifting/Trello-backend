@@ -6,6 +6,18 @@ definitions:
         example: 錯誤訊息
         type: string
     type: object
+  models.ChangePasswordRequest:
+    properties:
+      new_password:
+        example: newpass123
+        type: string
+      old_password:
+        example: oldpass123
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
   models.LoginRequest:
     properties:
       email:
@@ -45,9 +57,41 @@ host: localhost:8080
 info:
   contact: {}
   description: Trello 後端 API 文件
-  title: Trello Backend API
+  title: Trello 後端 API
   version: "1.0"
 paths:
+  /api/auth/change-password:
+    post:
+      consumes:
+      - application/json
+      description: 使用者變更密碼功能
+      parameters:
+      - description: 變更密碼資訊
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 密碼變更成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 無效的請求資料
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 認證失敗
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: 變更使用者密碼
+      tags:
+      - 認證
   /login:
     post:
       consumes:
@@ -108,4 +152,6 @@ paths:
       summary: 使用者註冊
       tags:
       - 認證
+schemes:
+- http
 swagger: "2.0"

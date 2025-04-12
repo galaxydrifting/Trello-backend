@@ -3,21 +3,28 @@ package routes
 import (
 	"trello-backend/internal/handlers"
 	"trello-backend/internal/middleware"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (r *Router) setupAuthRoutes() {
+func (r *Router) setupAuthRoutes(api *gin.RouterGroup) {
 	authHandler := r.handlers["auth"].(*handlers.AuthHandler)
 
-	auth := r.engine.Group("/auth")
+	// 認證相關路由群組
+	auth := api.Group("/auth")
 	{
-		auth.POST("/register", authHandler.Register)
-		auth.POST("/login", authHandler.Login)
-	}
+		// 公開的認證端點
+		public := auth.Group("")
+		{
+			public.POST("/register", authHandler.Register)
+			public.POST("/login", authHandler.Login)
+		}
 
-	// 需要認證的路由
-	authProtected := auth.Group("")
-	authProtected.Use(middleware.AuthMiddleware(r.jwtSecret))
-	{
-		authProtected.POST("/change-password", authHandler.ChangePassword)
+		// 需要認證的端點
+		protected := auth.Group("")
+		protected.Use(middleware.AuthMiddleware(r.jwtSecret))
+		{
+			protected.POST("/change-password", authHandler.ChangePassword)
+		}
 	}
 }

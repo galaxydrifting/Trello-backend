@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api
 definitions:
   models.APIResponse:
     properties:
@@ -154,4 +154,9 @@ paths:
       - 認證
 schemes:
 - http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

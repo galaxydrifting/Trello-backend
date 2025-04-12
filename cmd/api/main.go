@@ -18,8 +18,11 @@ import (
 // @version 1.0
 // @description Trello 後端 API 文件
 // @host localhost:8080
-// @BasePath /
+// @BasePath /api
 // @schemes http
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func initDB(cfg *config.Config) *gorm.DB {
 	db, err := gorm.Open(postgres.Open(cfg.GetDBConnString()), &gorm.Config{})
 	if err != nil {
@@ -40,7 +43,7 @@ func setupSwagger() {
 	docs.SwaggerInfo.Description = "Trello 後端 API 文件"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:8080"
-	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.BasePath = "/api"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 }
 

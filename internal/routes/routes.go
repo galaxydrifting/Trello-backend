@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"trello-backend/internal/middleware"
-
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -31,12 +29,13 @@ func (r *Router) SetupRoutes() {
 	// Swagger 文件路由
 	r.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// 設定認證相關路由
-	r.setupAuthRoutes()
-
 	// API 路由群組
 	api := r.engine.Group("/api")
-	api.Use(middleware.AuthMiddleware(r.jwtSecret))
 
-	// TODO: 在這裡加入其他 API 路由群組
+	// 設定各個功能模組的路由
+	r.setupAuthRoutes(api)
+	// 之後可以輕鬆添加其他模組的路由
+	// r.setupBoardRoutes(api)
+	// r.setupCardRoutes(api)
+	// r.setupListRoutes(api)
 }

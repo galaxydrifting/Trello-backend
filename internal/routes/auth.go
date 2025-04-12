@@ -18,6 +18,7 @@ func (r *Router) setupAuthRoutes(api *gin.RouterGroup) {
 		{
 			public.POST("/register", authHandler.Register)
 			public.POST("/login", authHandler.Login)
+			public.GET("/ping", authHandler.Ping)
 		}
 
 		// 需要認證的端點

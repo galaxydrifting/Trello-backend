@@ -107,3 +107,14 @@ func (h *AuthHandler) ChangePassword(c *gin.Context) {
 
 	c.JSON(http.StatusOK, models.APIResponse{})
 }
+
+// Ping godoc
+// @Summary 測試 API 是否正常運作
+// @Description 回傳簡單的 pong 回應
+// @Tags 系統
+// @Produce json
+// @Success 200 {object} models.APIResponse "成功回應"
+// @Router /auth/ping [get]
+func (h *AuthHandler) Ping(c *gin.Context) {
+	c.JSON(http.StatusOK, models.APIResponse{})
+}

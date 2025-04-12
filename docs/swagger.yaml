@@ -122,6 +122,19 @@ paths:
       summary: 使用者登入
       tags:
       - 認證
+  /auth/ping:
+    get:
+      description: 回傳簡單的 pong 回應
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功回應
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      summary: 測試 API 是否正常運作
+      tags:
+      - 系統
   /auth/register:
     post:
       consumes:

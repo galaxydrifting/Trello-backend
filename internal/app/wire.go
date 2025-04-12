@@ -8,13 +8,13 @@ import (
 	"gorm.io/gorm"
 
 	"trello-backend/internal/handlers"
-	"trello-backend/internal/repository/postgres"
+	"trello-backend/internal/repository"
 	"trello-backend/internal/services"
 )
 
 // 使用者領域的 Provider Set
 var userDomainSet = wire.NewSet(
-	postgres.NewUserRepository,
+	repository.NewUserRepository,
 	services.NewAuthService,
 	handlers.NewAuthHandler,
 )

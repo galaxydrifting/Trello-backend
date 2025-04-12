@@ -8,15 +8,15 @@ definitions:
     type: object
   models.ChangePasswordRequest:
     properties:
-      new_password:
+      newPassword:
         example: newpass123
         type: string
-      old_password:
+      oldPassword:
         example: oldpass123
         type: string
     required:
-    - new_password
-    - old_password
+    - newPassword
+    - oldPassword
     type: object
   models.LoginRequest:
     properties:
@@ -60,7 +60,7 @@ info:
   title: Trello 後端 API
   version: "1.0"
 paths:
-  /api/auth/change-password:
+  /auth/change-password:
     post:
       consumes:
       - application/json
@@ -92,7 +92,7 @@ paths:
       summary: 變更使用者密碼
       tags:
       - 認證
-  /login:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -122,7 +122,7 @@ paths:
       summary: 使用者登入
       tags:
       - 認證
-  /register:
+  /auth/register:
     post:
       consumes:
       - application/json

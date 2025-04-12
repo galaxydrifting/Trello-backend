@@ -15,7 +15,7 @@ func (r *Router) setupAuthRoutes() {
 	}
 
 	// 需要認證的路由
-	authProtected := r.engine.Group("/api/auth")
+	authProtected := auth.Group("")
 	authProtected.Use(middleware.AuthMiddleware(r.jwtSecret))
 	{
 		authProtected.POST("/change-password", authHandler.ChangePassword)

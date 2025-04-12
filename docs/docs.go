@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/auth/change-password": {
+        "/auth/change-password": {
             "post": {
                 "security": [
                     {
@@ -66,7 +66,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login": {
+        "/auth/login": {
             "post": {
                 "description": "使用電子郵件和密碼登入並返回 JWT 令牌",
                 "consumes": [
@@ -112,7 +112,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/auth/register": {
             "post": {
                 "description": "註冊新使用者並返回 JWT 令牌",
                 "consumes": [
@@ -172,15 +172,15 @@ const docTemplate = `{
         "models.ChangePasswordRequest": {
             "type": "object",
             "required": [
-                "new_password",
-                "old_password"
+                "newPassword",
+                "oldPassword"
             ],
             "properties": {
-                "new_password": {
+                "newPassword": {
                     "type": "string",
                     "example": "newpass123"
                 },
-                "old_password": {
+                "oldPassword": {
                     "type": "string",
                     "example": "oldpass123"
                 }

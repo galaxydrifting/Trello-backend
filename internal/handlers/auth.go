@@ -31,7 +31,7 @@ func NewAuthHandler(authSvc services.AuthService) *AuthHandler {
 // @Success 201 {object} models.LoginResponse "註冊成功"
 // @Failure 400 {object} models.APIResponse "無效的請求資料"
 // @Failure 500 {object} models.APIResponse "內部伺服器錯誤"
-// @Router /register [post]
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req models.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -58,7 +58,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Success 200 {object} models.LoginResponse "登入成功"
 // @Failure 400 {object} models.APIResponse "無效的請求資料"
 // @Failure 401 {object} models.APIResponse "帳號或密碼錯誤"
-// @Router /login [post]
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -86,7 +86,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Success 200 {object} models.APIResponse "密碼變更成功"
 // @Failure 400 {object} models.APIResponse "無效的請求資料"
 // @Failure 401 {object} models.APIResponse "認證失敗"
-// @Router /api/auth/change-password [post]
+// @Router /auth/change-password [post]
 func (h *AuthHandler) ChangePassword(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

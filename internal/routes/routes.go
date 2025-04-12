@@ -1,11 +1,12 @@
 package routes
 
 import (
+	"trello-backend/internal/config"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"trello-backend/internal/config"
 )
 
 type Router struct {
@@ -21,9 +22,9 @@ func NewRouter(engine *gin.Engine, jwtSecret string, cfg *config.Config) *Router
 	corsConfig.AllowOrigins = cfg.CORSAllowOrigins
 	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	
+
 	engine.Use(cors.New(corsConfig))
-	
+
 	return &Router{
 		engine:    engine,
 		handlers:  make(map[string]interface{}),

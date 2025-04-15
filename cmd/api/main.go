@@ -10,7 +10,6 @@ import (
 	"trello-backend/docs"
 	"trello-backend/internal/app"
 	"trello-backend/internal/config"
-	"trello-backend/internal/models"
 	"trello-backend/internal/routes"
 )
 
@@ -29,10 +28,9 @@ func initDB(cfg *config.Config) *gorm.DB {
 		log.Fatal("無法連線到資料庫:", err)
 	}
 
-	err = db.AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatal("資料庫遷移失敗:", err)
-	}
+	// Run migrations
+	app.Migrate(db)
+
 	log.Println("資料庫遷移完成")
 
 	return db

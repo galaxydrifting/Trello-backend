@@ -10,7 +10,7 @@ import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
 	"trello-backend/internal/handlers"
-	"trello-backend/internal/repository"
+	"trello-backend/internal/repositories"
 	"trello-backend/internal/services"
 )
 
@@ -18,7 +18,7 @@ import (
 
 // InitializeAPI 初始化 API 相依性
 func InitializeAPI(db *gorm.DB, jwtSecret string) (*API, error) {
-	userRepository := repository.NewUserRepository(db)
+	userRepository := repositories.NewUserRepository(db)
 	authService := services.NewAuthService(userRepository, jwtSecret)
 	authHandler := handlers.NewAuthHandler(authService)
 	api := NewAPI(authHandler)
@@ -55,7 +55,7 @@ func (a *API) GetHandlers() map[string]Handler {
 }
 
 // 使用者領域的 Provider Set
-var userDomainSet = wire.NewSet(repository.NewUserRepository, services.NewAuthService, handlers.NewAuthHandler)
+var userDomainSet = wire.NewSet(repositories.NewUserRepository, services.NewAuthService, handlers.NewAuthHandler)
 
 // API Provider Set
 var apiSet = wire.NewSet(

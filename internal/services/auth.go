@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"trello-backend/internal/models"
-	"trello-backend/internal/repository"
+	"trello-backend/internal/repositories"
 	"trello-backend/pkg/utils"
 )
 
@@ -18,11 +18,11 @@ type AuthService interface {
 }
 
 type authService struct {
-	userRepo  repository.UserRepository
+	userRepo  repositories.UserRepository
 	jwtSecret string
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthService {
+func NewAuthService(userRepo repositories.UserRepository, jwtSecret string) AuthService {
 	return &authService{
 		userRepo:  userRepo,
 		jwtSecret: jwtSecret,

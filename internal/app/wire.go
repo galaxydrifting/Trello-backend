@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"trello-backend/internal/handlers"
-	"trello-backend/internal/repository"
+	"trello-backend/internal/repositories"
 	"trello-backend/internal/services"
 )
 
@@ -41,7 +41,7 @@ func (a *API) GetHandlers() map[string]Handler {
 
 // 使用者領域的 Provider Set
 var userDomainSet = wire.NewSet(
-	repository.NewUserRepository,
+	repositories.NewUserRepository,
 	services.NewAuthService,
 	handlers.NewAuthHandler,
 )

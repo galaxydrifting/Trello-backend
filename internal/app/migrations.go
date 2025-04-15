@@ -3,8 +3,9 @@ package app
 import (
 	"log"
 
-	"gorm.io/gorm"
 	"trello-backend/internal/models"
+
+	"gorm.io/gorm"
 )
 
 // Migrate runs the database migrations

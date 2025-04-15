@@ -1,8 +1,9 @@
 package repositories
 
 import (
-	"gorm.io/gorm"
 	"trello-backend/internal/models"
+
+	"gorm.io/gorm"
 )
 
 // BoardRepository handles CRUD operations for Board

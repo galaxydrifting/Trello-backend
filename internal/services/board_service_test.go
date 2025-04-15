@@ -3,9 +3,10 @@ package services
 import (
 	"testing"
 
+	"trello-backend/internal/models"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"trello-backend/internal/models"
 )
 
 type MockBoardRepository struct {

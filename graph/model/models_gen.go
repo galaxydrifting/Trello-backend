@@ -2,6 +2,60 @@
 
 package model
 
+type Board struct {
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	CreatedAt string  `json:"createdAt"`
+	UpdatedAt string  `json:"updatedAt"`
+	Lists     []*List `json:"lists"`
+}
+
+type Card struct {
+	ID        string  `json:"id"`
+	Title     string  `json:"title"`
+	Content   *string `json:"content,omitempty"`
+	ListID    string  `json:"listId"`
+	CreatedAt string  `json:"createdAt"`
+	UpdatedAt string  `json:"updatedAt"`
+	Position  int32   `json:"position"`
+}
+
+type CreateBoardInput struct {
+	Name string `json:"name"`
+}
+
+type CreateCardInput struct {
+	ListID  string  `json:"listId"`
+	Title   string  `json:"title"`
+	Content *string `json:"content,omitempty"`
+}
+
+type CreateListInput struct {
+	BoardID string `json:"boardId"`
+	Name    string `json:"name"`
+}
+
+type List struct {
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	BoardID   string  `json:"boardId"`
+	CreatedAt string  `json:"createdAt"`
+	UpdatedAt string  `json:"updatedAt"`
+	Position  int32   `json:"position"`
+	Cards     []*Card `json:"cards"`
+}
+
+type MoveCardInput struct {
+	ID           string `json:"id"`
+	TargetListID string `json:"targetListId"`
+	NewPosition  int32  `json:"newPosition"`
+}
+
+type MoveListInput struct {
+	ID          string `json:"id"`
+	NewPosition int32  `json:"newPosition"`
+}
+
 type Mutation struct {
 }
 
@@ -18,6 +72,22 @@ type Todo struct {
 	Text string `json:"text"`
 	Done bool   `json:"done"`
 	User *User  `json:"user"`
+}
+
+type UpdateBoardInput struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type UpdateCardInput struct {
+	ID      string  `json:"id"`
+	Title   string  `json:"title"`
+	Content *string `json:"content,omitempty"`
+}
+
+type UpdateListInput struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type User struct {

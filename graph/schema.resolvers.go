@@ -7,17 +7,340 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"trello-backend/graph/model"
 )
+
+// 型別轉換工具
+func intToInt32(i int) int32    { return int32(i) }
+func strToPtr(s string) *string { return &s }
+func ptrToStr(s *string) string {
+	if s == nil {
+		return ""
+	} else {
+		return *s
+	}
+}
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
+// CreateBoard is the resolver for the createBoard field.
+func (r *mutationResolver) CreateBoard(ctx context.Context, input model.CreateBoardInput) (*model.Board, error) {
+	b, err := r.BoardService.CreateBoard(input.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Board{
+		ID:        strconv.FormatUint(uint64(b.ID), 10),
+		Name:      b.Name,
+		CreatedAt: b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: b.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}, nil
+}
+
+func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBoardInput) (*model.Board, error) {
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	err = r.BoardService.UpdateBoard(uint(id), input.Name)
+	if err != nil {
+		return nil, err
+	}
+	b, err := r.BoardService.GetBoard(uint(id))
+	if err != nil {
+		return nil, err
+	}
+	return &model.Board{
+		ID:        strconv.FormatUint(uint64(b.ID), 10),
+		Name:      b.Name,
+		CreatedAt: b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: b.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}, nil
+}
+
+func (r *mutationResolver) DeleteBoard(ctx context.Context, id string) (bool, error) {
+	bid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return false, err
+	}
+	err = r.BoardService.DeleteBoard(uint(bid))
+	return err == nil, err
+}
+
+// CreateList is the resolver for the createList field.
+func (r *mutationResolver) CreateList(ctx context.Context, input model.CreateListInput) (*model.List, error) {
+	bid, err := strconv.ParseUint(input.BoardID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	l, err := r.ListService.CreateList(uint(bid), input.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &model.List{
+		ID:        strconv.FormatUint(uint64(l.ID), 10),
+		Name:      l.Name,
+		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
+		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(l.Position),
+	}, nil
+}
+
+func (r *mutationResolver) UpdateList(ctx context.Context, input model.UpdateListInput) (*model.List, error) {
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	err = r.ListService.UpdateList(uint(id), input.Name)
+	if err != nil {
+		return nil, err
+	}
+	l, err := r.ListService.ListRepo.GetListByID(uint(id))
+	if err != nil {
+		return nil, err
+	}
+	return &model.List{
+		ID:        strconv.FormatUint(uint64(l.ID), 10),
+		Name:      l.Name,
+		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
+		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(l.Position),
+	}, nil
+}
+
+func (r *mutationResolver) DeleteList(ctx context.Context, id string) (bool, error) {
+	lid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return false, err
+	}
+	err = r.ListService.DeleteList(uint(lid))
+	return err == nil, err
+}
+
+func (r *mutationResolver) MoveList(ctx context.Context, input model.MoveListInput) (*model.List, error) {
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	err = r.ListService.MoveList(uint(id), int(input.NewPosition))
+	if err != nil {
+		return nil, err
+	}
+	l, err := r.ListService.ListRepo.GetListByID(uint(id))
+	if err != nil {
+		return nil, err
+	}
+	return &model.List{
+		ID:        strconv.FormatUint(uint64(l.ID), 10),
+		Name:      l.Name,
+		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
+		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(l.Position),
+	}, nil
+}
+
+// CreateCard is the resolver for the createCard field.
+func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCardInput) (*model.Card, error) {
+	lid, err := strconv.ParseUint(input.ListID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	c, err := r.CardService.CreateCard(uint(lid), input.Title, ptrToStr(input.Content))
+	if err != nil {
+		return nil, err
+	}
+	return &model.Card{
+		ID:        strconv.FormatUint(uint64(c.ID), 10),
+		Title:     c.Title,
+		Content:   strToPtr(c.Content),
+		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
+		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(c.Position),
+	}, nil
+}
+
+func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCardInput) (*model.Card, error) {
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	err = r.CardService.UpdateCard(uint(id), input.Title, ptrToStr(input.Content))
+	if err != nil {
+		return nil, err
+	}
+	c, err := r.CardService.CardRepo.GetCardByID(uint(id))
+	if err != nil {
+		return nil, err
+	}
+	return &model.Card{
+		ID:        strconv.FormatUint(uint64(c.ID), 10),
+		Title:     c.Title,
+		Content:   strToPtr(c.Content),
+		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
+		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(c.Position),
+	}, nil
+}
+
+func (r *mutationResolver) DeleteCard(ctx context.Context, id string) (bool, error) {
+	cid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return false, err
+	}
+	err = r.CardService.DeleteCard(uint(cid))
+	return err == nil, err
+}
+
+func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInput) (*model.Card, error) {
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	targetListID, err := strconv.ParseUint(input.TargetListID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	err = r.CardService.MoveCard(uint(id), uint(targetListID), int(input.NewPosition))
+	if err != nil {
+		return nil, err
+	}
+	c, err := r.CardService.CardRepo.GetCardByID(uint(id))
+	if err != nil {
+		return nil, err
+	}
+	return &model.Card{
+		ID:        strconv.FormatUint(uint64(c.ID), 10),
+		Title:     c.Title,
+		Content:   strToPtr(c.Content),
+		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
+		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(c.Position),
+	}, nil
+}
+
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: Todos - todos"))
+}
+
+// Boards 查詢
+func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
+	boards := []*model.Board{}
+	// 這裡假設只有單一 board，實務可擴充
+	return boards, nil
+}
+
+func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, error) {
+	boardID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	b, err := r.BoardService.GetBoard(uint(boardID))
+	if err != nil {
+		return nil, err
+	}
+	return &model.Board{
+		ID:        strconv.FormatUint(uint64(b.ID), 10),
+		Name:      b.Name,
+		CreatedAt: b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: b.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}, nil
+}
+
+func (r *queryResolver) Lists(ctx context.Context, boardID string) ([]*model.List, error) {
+	bid, err := strconv.ParseUint(boardID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	lists, err := r.ListService.GetLists(uint(bid))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*model.List, 0, len(lists))
+	for _, l := range lists {
+		result = append(result, &model.List{
+			ID:        strconv.FormatUint(uint64(l.ID), 10),
+			Name:      l.Name,
+			BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
+			CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			Position:  intToInt32(l.Position),
+		})
+	}
+	return result, nil
+}
+
+func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error) {
+	listID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	l, err := r.ListService.ListRepo.GetListByID(uint(listID))
+	if err != nil {
+		return nil, err
+	}
+	return &model.List{
+		ID:        strconv.FormatUint(uint64(l.ID), 10),
+		Name:      l.Name,
+		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
+		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(l.Position),
+	}, nil
+}
+
+func (r *queryResolver) Cards(ctx context.Context, listID string) ([]*model.Card, error) {
+	lid, err := strconv.ParseUint(listID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	cards, err := r.CardService.GetCards(uint(lid))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*model.Card, 0, len(cards))
+	for _, c := range cards {
+		result = append(result, &model.Card{
+			ID:        strconv.FormatUint(uint64(c.ID), 10),
+			Title:     c.Title,
+			Content:   strToPtr(c.Content),
+			ListID:    strconv.FormatUint(uint64(c.ListID), 10),
+			CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			Position:  intToInt32(c.Position),
+		})
+	}
+	return result, nil
+}
+
+func (r *queryResolver) Card(ctx context.Context, id string) (*model.Card, error) {
+	cid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	c, err := r.CardService.CardRepo.GetCardByID(uint(cid))
+	if err != nil {
+		return nil, err
+	}
+	return &model.Card{
+		ID:        strconv.FormatUint(uint64(c.ID), 10),
+		Title:     c.Title,
+		Content:   strToPtr(c.Content),
+		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
+		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		Position:  intToInt32(c.Position),
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

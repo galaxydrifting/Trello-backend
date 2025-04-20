@@ -14,8 +14,46 @@ type User {
   name: String!
 }
 
+# Kanban Board Types
+
+type Board {
+  id: ID!
+  name: String!
+  createdAt: String!
+  updatedAt: String!
+  lists: [List!]!
+}
+
+type List {
+  id: ID!
+  name: String!
+  boardId: ID!
+  createdAt: String!
+  updatedAt: String!
+  position: Int!
+  cards: [Card!]!
+}
+
+type Card {
+  id: ID!
+  title: String!
+  content: String
+  listId: ID!
+  createdAt: String!
+  updatedAt: String!
+  position: Int!
+}
+
+# 查詢
+
 type Query {
   todos: [Todo!]!
+  boards: [Board!]!
+  board(id: ID!): Board
+  lists(boardId: ID!): [List!]!
+  list(id: ID!): List
+  cards(listId: ID!): [Card!]!
+  card(id: ID!): Card
 }
 
 input NewTodo {
@@ -23,6 +61,65 @@ input NewTodo {
   userId: String!
 }
 
+# 輸入型別
+
+input CreateBoardInput {
+  name: String!
+}
+
+input UpdateBoardInput {
+  id: ID!
+  name: String!
+}
+
+input CreateListInput {
+  boardId: ID!
+  name: String!
+}
+
+input UpdateListInput {
+  id: ID!
+  name: String!
+}
+
+input MoveListInput {
+  id: ID!
+  newPosition: Int!
+}
+
+input CreateCardInput {
+  listId: ID!
+  title: String!
+  content: String
+}
+
+input UpdateCardInput {
+  id: ID!
+  title: String!
+  content: String
+}
+
+input MoveCardInput {
+  id: ID!
+  targetListId: ID!
+  newPosition: Int!
+}
+
+# 變更
+
 type Mutation {
   createTodo(input: NewTodo!): Todo!
+  createBoard(input: CreateBoardInput!): Board!
+  updateBoard(input: UpdateBoardInput!): Board!
+  deleteBoard(id: ID!): Boolean!
+
+  createList(input: CreateListInput!): List!
+  updateList(input: UpdateListInput!): List!
+  deleteList(id: ID!): Boolean!
+  moveList(input: MoveListInput!): List!
+
+  createCard(input: CreateCardInput!): Card!
+  updateCard(input: UpdateCardInput!): Card!
+  deleteCard(id: ID!): Boolean!
+  moveCard(input: MoveCardInput!): Card!
 }

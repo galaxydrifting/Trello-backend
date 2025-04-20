@@ -11,7 +11,9 @@ import (
 	"trello-backend/graph"
 	"trello-backend/internal/app"
 	"trello-backend/internal/config"
+	"trello-backend/internal/repositories"
 	"trello-backend/internal/routes"
+	"trello-backend/internal/services"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -66,11 +68,25 @@ func main() {
 		log.Fatal("無法初始化 API:", err)
 	}
 
+	// 初始化 repository
+	boardRepo := repositories.BoardRepository{DB: db}
+	listRepo := repositories.ListRepository{DB: db}
+	cardRepo := repositories.CardRepository{DB: db}
+
+	// 初始化 service
+	boardService := &services.BoardService{BoardRepo: &boardRepo}
+	listService := &services.ListService{ListRepo: &listRepo}
+	cardService := &services.CardService{CardRepo: &cardRepo}
+
 	// 設定路由
 	engine := gin.Default()
 
 	// GraphQL 設定
-	gqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	gqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		BoardService: boardService,
+		ListService:  listService,
+		CardService:  cardService,
+	}}))
 	gqlSrv.AddTransport(transport.Options{})
 	gqlSrv.AddTransport(transport.GET{})
 	gqlSrv.AddTransport(transport.POST{})

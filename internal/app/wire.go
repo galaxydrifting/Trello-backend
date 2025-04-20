@@ -7,7 +7,7 @@ import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
 
-	"trello-backend/internal/graph"
+	"trello-backend/graph"
 	"trello-backend/internal/handlers"
 	"trello-backend/internal/repositories"
 	"trello-backend/internal/services"
@@ -18,13 +18,19 @@ type Handler interface{}
 
 // API 包含所有的 handlers
 type API struct {
-	handlers map[string]Handler
+	handlers     map[string]Handler
+	BoardService services.BoardService
+	ListService  services.ListService
+	CardService  services.CardService
 }
 
 // NewAPI 建立新的 API 實例
-func NewAPI(authHandler *handlers.AuthHandler) *API {
+func NewAPI(authHandler *handlers.AuthHandler, boardService services.BoardService, listService services.ListService, cardService services.CardService) *API {
 	api := &API{
-		handlers: make(map[string]Handler),
+		handlers:     make(map[string]Handler),
+		BoardService: boardService,
+		ListService:  listService,
+		CardService:  cardService,
 	}
 	api.RegisterHandler("auth", authHandler)
 	return api
@@ -77,7 +83,7 @@ var apiSet = wire.NewSet(
 )
 
 // InitializeAPI 初始化 API 相依性
-func InitializeAPI(db *gorm.DB, jwtSecret string) (*API, *graph.Resolver, error) {
+func InitializeAPI(db *gorm.DB, jwtSecret string) (*API, error) {
 	wire.Build(apiSet)
-	return nil, nil, nil
+	return nil, nil
 }

@@ -100,7 +100,7 @@ func (r *mutationResolver) UpdateList(ctx context.Context, input model.UpdateLis
 	if err != nil {
 		return nil, err
 	}
-	l, err := r.ListService.ListRepo.GetListByID(uint(id))
+	l, err := r.ListService.GetListByID(uint(id))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (r *mutationResolver) MoveList(ctx context.Context, input model.MoveListInp
 	if err != nil {
 		return nil, err
 	}
-	l, err := r.ListService.ListRepo.GetListByID(uint(id))
+	l, err := r.ListService.GetListByID(uint(id))
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCar
 	if err != nil {
 		return nil, err
 	}
-	c, err := r.CardService.CardRepo.GetCardByID(uint(id))
+	c, err := r.CardService.GetCardByID(uint(id))
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInp
 	if err != nil {
 		return nil, err
 	}
-	c, err := r.CardService.CardRepo.GetCardByID(uint(id))
+	c, err := r.CardService.GetCardByID(uint(id))
 	if err != nil {
 		return nil, err
 	}
@@ -285,7 +285,7 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 	if err != nil {
 		return nil, err
 	}
-	l, err := r.ListService.ListRepo.GetListByID(uint(listID))
+	l, err := r.ListService.GetListByID(uint(listID))
 	if err != nil {
 		return nil, err
 	}
@@ -328,7 +328,7 @@ func (r *queryResolver) Card(ctx context.Context, id string) (*model.Card, error
 	if err != nil {
 		return nil, err
 	}
-	c, err := r.CardService.CardRepo.GetCardByID(uint(cid))
+	c, err := r.CardService.GetCardByID(uint(cid))
 	if err != nil {
 		return nil, err
 	}

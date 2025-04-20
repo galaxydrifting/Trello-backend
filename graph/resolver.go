@@ -9,7 +9,15 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	BoardService *services.BoardService
-	ListService  *services.ListService
-	CardService  *services.CardService
+	BoardService services.BoardService
+	ListService  services.ListService
+	CardService  services.CardService
+}
+
+func NewResolver(boardService services.BoardService, listService services.ListService, cardService services.CardService) *Resolver {
+	return &Resolver{
+		BoardService: boardService,
+		ListService:  listService,
+		CardService:  cardService,
+	}
 }

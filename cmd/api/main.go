@@ -70,7 +70,13 @@ func main() {
 	engine := gin.Default()
 
 	// GraphQL 設定
-	gqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	gqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{
+			BoardService: api.BoardService,
+			ListService:  api.ListService,
+			CardService:  api.CardService,
+		},
+	}))
 	gqlSrv.AddTransport(transport.Options{})
 	gqlSrv.AddTransport(transport.GET{})
 	gqlSrv.AddTransport(transport.POST{})

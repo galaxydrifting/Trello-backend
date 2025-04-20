@@ -13,7 +13,16 @@
 	"forwardPorts": [
 		5432,
 		8080
-	]
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"mhutchie.git-graph",
+				"GitHub.copilot",
+				"GitHub.copilot-chat"
+			]
+		}
+	}
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "go version",
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

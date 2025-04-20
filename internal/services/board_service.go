@@ -17,6 +17,10 @@ type BoardService struct {
 	BoardRepo BoardRepository
 }
 
+func NewBoardService(repo BoardRepository) *BoardService {
+	return &BoardService{BoardRepo: repo}
+}
+
 func (s *BoardService) CreateBoard(name string) (*models.Board, error) {
 	board := &models.Board{Name: name}
 	if err := s.BoardRepo.CreateBoard(board); err != nil {

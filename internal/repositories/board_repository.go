@@ -11,6 +11,10 @@ type BoardRepository struct {
 	DB *gorm.DB
 }
 
+func NewBoardRepository(db *gorm.DB) *BoardRepository {
+	return &BoardRepository{DB: db}
+}
+
 func (r *BoardRepository) CreateBoard(board *models.Board) error {
 	return r.DB.Create(board).Error
 }

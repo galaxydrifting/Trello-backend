@@ -36,3 +36,7 @@ func (r *CardRepository) UpdateCard(card *models.Card) error {
 func (r *CardRepository) DeleteCard(id uint) error {
 	return r.DB.Delete(&models.Card{}, id).Error
 }
+
+func NewCardRepository(db *gorm.DB) *CardRepository {
+	return &CardRepository{DB: db}
+}

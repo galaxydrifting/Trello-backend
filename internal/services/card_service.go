@@ -16,6 +16,10 @@ type CardService struct {
 	CardRepo CardRepository
 }
 
+func NewCardService(repo CardRepository) *CardService {
+	return &CardService{CardRepo: repo}
+}
+
 func (s *CardService) CreateCard(listID uint, title, content string) (*models.Card, error) {
 	cards, err := s.CardRepo.GetCardsByListID(listID)
 	if err != nil {

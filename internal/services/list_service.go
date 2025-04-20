@@ -16,6 +16,10 @@ type ListService struct {
 	ListRepo ListRepository
 }
 
+func NewListService(repo ListRepository) *ListService {
+	return &ListService{ListRepo: repo}
+}
+
 func (s *ListService) CreateList(boardID uint, name string) (*models.List, error) {
 	lists, err := s.ListRepo.GetListsByBoardID(boardID)
 	if err != nil {

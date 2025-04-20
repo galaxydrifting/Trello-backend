@@ -11,6 +11,10 @@ type ListRepository struct {
 	DB *gorm.DB
 }
 
+func NewListRepository(db *gorm.DB) *ListRepository {
+	return &ListRepository{DB: db}
+}
+
 func (r *ListRepository) CreateList(list *models.List) error {
 	return r.DB.Create(list).Error
 }

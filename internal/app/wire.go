@@ -10,6 +10,7 @@ import (
 	"trello-backend/internal/handlers"
 	"trello-backend/internal/repositories"
 	"trello-backend/internal/services"
+	"trello-backend/internal/graph"
 )
 
 // Handler 介面定義所有 handler 必須實作的方法
@@ -46,14 +47,37 @@ var userDomainSet = wire.NewSet(
 	handlers.NewAuthHandler,
 )
 
+// Board/List/Card Provider Set
+var boardDomainSet = wire.NewSet(
+	repositories.NewBoardRepository,
+	services.NewBoardService,
+)
+var listDomainSet = wire.NewSet(
+	repositories.NewListRepository,
+	services.NewListService,
+)
+var cardDomainSet = wire.NewSet(
+	repositories.NewCardRepository,
+	services.NewCardService,
+)
+
+// GraphQL Resolver Provider
+var resolverSet = wire.NewSet(
+	boardDomainSet,
+	listDomainSet,
+	cardDomainSet,
+	graph.NewResolver,
+)
+
 // API Provider Set
 var apiSet = wire.NewSet(
 	userDomainSet,
+	resolverSet,
 	NewAPI,
 )
 
 // InitializeAPI 初始化 API 相依性
-func InitializeAPI(db *gorm.DB, jwtSecret string) (*API, error) {
+func InitializeAPI(db *gorm.DB, jwtSecret string) (*API, *graph.Resolver, error) {
 	wire.Build(apiSet)
-	return nil, nil
+	return nil, nil, nil
 }

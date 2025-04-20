@@ -61,3 +61,30 @@ func TestBoardService_GetBoard(t *testing.T) {
 	assert.Equal(t, uint(1), result.ID)
 	assert.Equal(t, "Test Board", result.Name)
 }
+
+func TestBoardService_UpdateBoard(t *testing.T) {
+	repo := new(MockBoardRepository)
+	service := BoardService{BoardRepo: repo}
+	id := uint(10)
+	old := &models.Board{ID: id, Name: "OldName"}
+	repo.On("GetBoardByID", id).Return(old, nil)
+	repo.On("UpdateBoard", old).Return(nil)
+
+	err := service.UpdateBoard(id, "NewName")
+
+	repo.AssertExpectations(t)
+	assert.NoError(t, err)
+	assert.Equal(t, "NewName", old.Name)
+}
+
+func TestBoardService_DeleteBoard(t *testing.T) {
+	repo := new(MockBoardRepository)
+	service := BoardService{BoardRepo: repo}
+	id := uint(20)
+	repo.On("DeleteBoard", id).Return(nil)
+
+	err := service.DeleteBoard(id)
+
+	repo.AssertExpectations(t)
+	assert.NoError(t, err)
+}

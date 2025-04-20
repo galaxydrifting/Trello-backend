@@ -8,9 +8,17 @@ import (
 	"gorm.io/gorm"
 
 	"trello-backend/docs"
+	"trello-backend/graph"
 	"trello-backend/internal/app"
 	"trello-backend/internal/config"
 	"trello-backend/internal/routes"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 // @title Trello 後端 API
@@ -60,6 +68,23 @@ func main() {
 
 	// 設定路由
 	engine := gin.Default()
+
+	// GraphQL 設定
+	gqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	gqlSrv.AddTransport(transport.Options{})
+	gqlSrv.AddTransport(transport.GET{})
+	gqlSrv.AddTransport(transport.POST{})
+	gqlSrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
+	gqlSrv.Use(extension.Introspection{})
+	gqlSrv.Use(extension.AutomaticPersistedQuery{Cache: lru.New[string](100)})
+
+	// GraphQL Playground 路由
+	engine.GET("/graphql/playground", gin.WrapH(playground.Handler("GraphQL playground", "/query")))
+	// GraphQL 查詢路由
+	engine.POST("/graphql/query", func(c *gin.Context) {
+		gqlSrv.ServeHTTP(c.Writer, c.Request)
+	})
+
 	router := routes.NewRouter(engine, cfg.JWTSecret, cfg)
 
 	// 註冊所有 handlers

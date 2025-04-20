@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"trello-backend/graph/model"
 )
@@ -20,11 +19,6 @@ func ptrToStr(s *string) string {
 	} else {
 		return *s
 	}
-}
-
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
 // CreateBoard is the resolver for the createBoard field.
@@ -41,6 +35,7 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.CreateBo
 	}, nil
 }
 
+// UpdateBoard is the resolver for the updateBoard field.
 func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBoardInput) (*model.Board, error) {
 	id, err := strconv.ParseUint(input.ID, 10, 64)
 	if err != nil {
@@ -62,6 +57,7 @@ func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBo
 	}, nil
 }
 
+// DeleteBoard is the resolver for the deleteBoard field.
 func (r *mutationResolver) DeleteBoard(ctx context.Context, id string) (bool, error) {
 	bid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -91,6 +87,7 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.CreateLis
 	}, nil
 }
 
+// UpdateList is the resolver for the updateList field.
 func (r *mutationResolver) UpdateList(ctx context.Context, input model.UpdateListInput) (*model.List, error) {
 	id, err := strconv.ParseUint(input.ID, 10, 64)
 	if err != nil {
@@ -114,6 +111,7 @@ func (r *mutationResolver) UpdateList(ctx context.Context, input model.UpdateLis
 	}, nil
 }
 
+// DeleteList is the resolver for the deleteList field.
 func (r *mutationResolver) DeleteList(ctx context.Context, id string) (bool, error) {
 	lid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -123,6 +121,7 @@ func (r *mutationResolver) DeleteList(ctx context.Context, id string) (bool, err
 	return err == nil, err
 }
 
+// MoveList is the resolver for the moveList field.
 func (r *mutationResolver) MoveList(ctx context.Context, input model.MoveListInput) (*model.List, error) {
 	id, err := strconv.ParseUint(input.ID, 10, 64)
 	if err != nil {
@@ -167,6 +166,7 @@ func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCar
 	}, nil
 }
 
+// UpdateCard is the resolver for the updateCard field.
 func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCardInput) (*model.Card, error) {
 	id, err := strconv.ParseUint(input.ID, 10, 64)
 	if err != nil {
@@ -191,6 +191,7 @@ func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCar
 	}, nil
 }
 
+// DeleteCard is the resolver for the deleteCard field.
 func (r *mutationResolver) DeleteCard(ctx context.Context, id string) (bool, error) {
 	cid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -200,6 +201,7 @@ func (r *mutationResolver) DeleteCard(ctx context.Context, id string) (bool, err
 	return err == nil, err
 }
 
+// MoveCard is the resolver for the moveCard field.
 func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInput) (*model.Card, error) {
 	id, err := strconv.ParseUint(input.ID, 10, 64)
 	if err != nil {
@@ -228,11 +230,6 @@ func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInp
 	}, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
-}
-
 // Boards 查詢
 func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
 	boards := []*model.Board{}
@@ -240,6 +237,7 @@ func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
 	return boards, nil
 }
 
+// Board is the resolver for the board field.
 func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, error) {
 	boardID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -257,6 +255,7 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 	}, nil
 }
 
+// Lists is the resolver for the lists field.
 func (r *queryResolver) Lists(ctx context.Context, boardID string) ([]*model.List, error) {
 	bid, err := strconv.ParseUint(boardID, 10, 64)
 	if err != nil {
@@ -280,6 +279,7 @@ func (r *queryResolver) Lists(ctx context.Context, boardID string) ([]*model.Lis
 	return result, nil
 }
 
+// List is the resolver for the list field.
 func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error) {
 	listID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
@@ -299,6 +299,7 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 	}, nil
 }
 
+// Cards is the resolver for the cards field.
 func (r *queryResolver) Cards(ctx context.Context, listID string) ([]*model.Card, error) {
 	lid, err := strconv.ParseUint(listID, 10, 64)
 	if err != nil {
@@ -323,6 +324,7 @@ func (r *queryResolver) Cards(ctx context.Context, listID string) ([]*model.Card
 	return result, nil
 }
 
+// Card is the resolver for the card field.
 func (r *queryResolver) Card(ctx context.Context, id string) (*model.Card, error) {
 	cid, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {

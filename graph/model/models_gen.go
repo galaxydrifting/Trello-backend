@@ -59,19 +59,7 @@ type MoveListInput struct {
 type Mutation struct {
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
 type Query struct {
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
 }
 
 type UpdateBoardInput struct {
@@ -86,11 +74,6 @@ type UpdateCardInput struct {
 }
 
 type UpdateListInput struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }

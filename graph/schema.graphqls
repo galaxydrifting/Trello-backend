@@ -2,18 +2,6 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
-}
-
 # Kanban Board Types
 
 type Board {
@@ -47,18 +35,12 @@ type Card {
 # 查詢
 
 type Query {
-  todos: [Todo!]!
   boards: [Board!]!
   board(id: ID!): Board
   lists(boardId: ID!): [List!]!
   list(id: ID!): List
   cards(listId: ID!): [Card!]!
   card(id: ID!): Card
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
 }
 
 # 輸入型別
@@ -108,7 +90,6 @@ input MoveCardInput {
 # 變更
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
   createBoard(input: CreateBoardInput!): Board!
   updateBoard(input: UpdateBoardInput!): Board!
   deleteBoard(id: ID!): Boolean!

@@ -29,8 +29,8 @@ type Card struct {
 	ID        uint   `gorm:"primaryKey"`
 	Title     string `gorm:"not null"`
 	Content   string
-	ListID    uint   `gorm:"not null"`
+	ListID    uint `gorm:"not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Position  int    `gorm:"not null;default:0"`
+	Position  int `gorm:"not null;default:0"`
 }

@@ -2,11 +2,12 @@ package repositories
 
 import (
 	"trello-backend/internal/models"
+
 	"gorm.io/gorm"
 )
 
 // ListRepository 處理清單的資料操作
- type ListRepository struct {
+type ListRepository struct {
 	DB *gorm.DB
 }
 

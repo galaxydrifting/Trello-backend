@@ -2,37 +2,40 @@ package repositories
 
 import (
 	"trello-backend/internal/models"
-
 	"gorm.io/gorm"
 )
 
-// BoardRepository handles CRUD operations for Board
-type BoardRepository struct {
-	DB *gorm.DB
+type BoardRepository interface {
+	CreateBoard(board *models.Board) error
+	GetBoardByID(id uint) (*models.Board, error)
+	UpdateBoard(board *models.Board) error
+	DeleteBoard(id uint) error
 }
 
-func NewBoardRepository(db *gorm.DB) *BoardRepository {
-	return &BoardRepository{DB: db}
+type boardRepository struct {
+	db *gorm.DB
 }
 
-func (r *BoardRepository) CreateBoard(board *models.Board) error {
-	return r.DB.Create(board).Error
+func NewBoardRepository(db *gorm.DB) BoardRepository {
+	return &boardRepository{db: db}
 }
 
-func (r *BoardRepository) GetBoardByID(id uint) (*models.Board, error) {
+func (r *boardRepository) CreateBoard(board *models.Board) error {
+	return r.db.Create(board).Error
+}
+
+func (r *boardRepository) GetBoardByID(id uint) (*models.Board, error) {
 	var board models.Board
-	if err := r.DB.Preload("Lists.Cards").First(&board, id).Error; err != nil {
+	if err := r.db.Preload("Lists.Cards").First(&board, id).Error; err != nil {
 		return nil, err
 	}
 	return &board, nil
 }
 
-func (r *BoardRepository) UpdateBoard(board *models.Board) error {
-	return r.DB.Save(board).Error
+func (r *boardRepository) UpdateBoard(board *models.Board) error {
+	return r.db.Save(board).Error
 }
 
-func (r *BoardRepository) DeleteBoard(id uint) error {
-	return r.DB.Delete(&models.Board{}, id).Error
+func (r *boardRepository) DeleteBoard(id uint) error {
+	return r.db.Delete(&models.Board{}, id).Error
 }
-
-// Similar repositories can be created for List and Card.

@@ -2,46 +2,45 @@ package services
 
 import (
 	"trello-backend/internal/models"
+	"trello-backend/internal/repositories"
 )
 
-// BoardRepository defines the interface for board data operations
-type BoardRepository interface {
-	CreateBoard(board *models.Board) error
-	GetBoardByID(id uint) (*models.Board, error)
-	UpdateBoard(board *models.Board) error
+type BoardService interface {
+	CreateBoard(name string) (*models.Board, error)
+	GetBoard(id uint) (*models.Board, error)
+	UpdateBoard(id uint, name string) error
 	DeleteBoard(id uint) error
 }
 
-// BoardService provides business logic for boards
-type BoardService struct {
-	BoardRepo BoardRepository
+type boardService struct {
+	boardRepo repositories.BoardRepository
 }
 
-func NewBoardService(repo BoardRepository) *BoardService {
-	return &BoardService{BoardRepo: repo}
+func NewBoardService(repo repositories.BoardRepository) BoardService {
+	return &boardService{boardRepo: repo}
 }
 
-func (s *BoardService) CreateBoard(name string) (*models.Board, error) {
+func (s *boardService) CreateBoard(name string) (*models.Board, error) {
 	board := &models.Board{Name: name}
-	if err := s.BoardRepo.CreateBoard(board); err != nil {
+	if err := s.boardRepo.CreateBoard(board); err != nil {
 		return nil, err
 	}
 	return board, nil
 }
 
-func (s *BoardService) GetBoard(id uint) (*models.Board, error) {
-	return s.BoardRepo.GetBoardByID(id)
+func (s *boardService) GetBoard(id uint) (*models.Board, error) {
+	return s.boardRepo.GetBoardByID(id)
 }
 
-func (s *BoardService) UpdateBoard(id uint, name string) error {
-	board, err := s.BoardRepo.GetBoardByID(id)
+func (s *boardService) UpdateBoard(id uint, name string) error {
+	board, err := s.boardRepo.GetBoardByID(id)
 	if err != nil {
 		return err
 	}
 	board.Name = name
-	return s.BoardRepo.UpdateBoard(board)
+	return s.boardRepo.UpdateBoard(board)
 }
 
-func (s *BoardService) DeleteBoard(id uint) error {
-	return s.BoardRepo.DeleteBoard(id)
+func (s *boardService) DeleteBoard(id uint) error {
+	return s.boardRepo.DeleteBoard(id)
 }

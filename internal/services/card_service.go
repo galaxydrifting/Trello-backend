@@ -2,64 +2,70 @@ package services
 
 import (
 	"trello-backend/internal/models"
+	"trello-backend/internal/repositories"
 )
 
-type CardRepository interface {
-	CreateCard(card *models.Card) error
-	GetCardsByListID(listID uint) ([]models.Card, error)
+type CardService interface {
+	CreateCard(listID uint, title, content string) (*models.Card, error)
+	GetCards(listID uint) ([]models.Card, error)
 	GetCardByID(id uint) (*models.Card, error)
-	UpdateCard(card *models.Card) error
+	UpdateCard(id uint, title, content string) error
 	DeleteCard(id uint) error
+	MoveCard(id, targetListID uint, newPosition int) error
 }
 
-type CardService struct {
-	CardRepo CardRepository
+type cardService struct {
+	cardRepo repositories.CardRepository
 }
 
-func NewCardService(repo CardRepository) *CardService {
-	return &CardService{CardRepo: repo}
+func NewCardService(repo repositories.CardRepository) CardService {
+	return &cardService{cardRepo: repo}
 }
 
-func (s *CardService) CreateCard(listID uint, title, content string) (*models.Card, error) {
-	cards, err := s.CardRepo.GetCardsByListID(listID)
+func (s *cardService) CreateCard(listID uint, title, content string) (*models.Card, error) {
+	cards, err := s.cardRepo.GetCardsByListID(listID)
 	if err != nil {
 		return nil, err
 	}
 	position := len(cards)
 	card := &models.Card{ListID: listID, Title: title, Content: content, Position: position}
-	if err := s.CardRepo.CreateCard(card); err != nil {
+	if err := s.cardRepo.CreateCard(card); err != nil {
 		return nil, err
 	}
 	return card, nil
 }
 
-func (s *CardService) GetCards(listID uint) ([]models.Card, error) {
-	return s.CardRepo.GetCardsByListID(listID)
+func (s *cardService) GetCards(listID uint) ([]models.Card, error) {
+	return s.cardRepo.GetCardsByListID(listID)
 }
 
-func (s *CardService) UpdateCard(id uint, title, content string) error {
-	card, err := s.CardRepo.GetCardByID(id)
+func (s *cardService) GetCardByID(id uint) (*models.Card, error) {
+	return s.cardRepo.GetCardByID(id)
+}
+
+func (s *cardService) UpdateCard(id uint, title, content string) error {
+	card, err := s.cardRepo.GetCardByID(id)
 	if err != nil {
 		return err
 	}
 	card.Title = title
 	card.Content = content
-	return s.CardRepo.UpdateCard(card)
+	return s.cardRepo.UpdateCard(card)
 }
 
-func (s *CardService) DeleteCard(id uint) error {
-	return s.CardRepo.DeleteCard(id)
+func (s *cardService) DeleteCard(id uint) error {
+	return s.cardRepo.DeleteCard(id)
 }
 
-func (s *CardService) MoveCard(id, targetListID uint, newPosition int) error {
-	card, err := s.CardRepo.GetCardByID(id)
+func (s *cardService) MoveCard(id, targetListID uint, newPosition int) error {
+	card, err := s.cardRepo.GetCardByID(id)
 	if err != nil {
 		return err
 	}
 	oldListID := card.ListID
 	oldPos := card.Position
 	// 調整原清單中的卡片位置
-	oldCards, err := s.CardRepo.GetCardsByListID(oldListID)
+	oldCards, err := s.cardRepo.GetCardsByListID(oldListID)
 	if err != nil {
 		return err
 	}
@@ -69,14 +75,14 @@ func (s *CardService) MoveCard(id, targetListID uint, newPosition int) error {
 		}
 		if c.Position > oldPos {
 			c.Position--
-			if err := s.CardRepo.UpdateCard(&c); err != nil {
+			if err := s.cardRepo.UpdateCard(&c); err != nil {
 				return err
 			}
 		}
 	}
 	// 插入到新清單
 	card.ListID = targetListID
-	newCards, err := s.CardRepo.GetCardsByListID(targetListID)
+	newCards, err := s.cardRepo.GetCardsByListID(targetListID)
 	if err != nil {
 		return err
 	}
@@ -86,11 +92,11 @@ func (s *CardService) MoveCard(id, targetListID uint, newPosition int) error {
 	for _, c := range newCards {
 		if c.Position >= newPosition {
 			c.Position++
-			if err := s.CardRepo.UpdateCard(&c); err != nil {
+			if err := s.cardRepo.UpdateCard(&c); err != nil {
 				return err
 			}
 		}
 	}
 	card.Position = newPosition
-	return s.CardRepo.UpdateCard(card)
+	return s.cardRepo.UpdateCard(card)
 }

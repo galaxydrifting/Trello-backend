@@ -2,41 +2,47 @@ package repositories
 
 import (
 	"trello-backend/internal/models"
-
 	"gorm.io/gorm"
 )
 
-// CardRepository 處理卡片的資料操作
-type CardRepository struct {
-	DB *gorm.DB
+type CardRepository interface {
+	CreateCard(card *models.Card) error
+	GetCardsByListID(listID uint) ([]models.Card, error)
+	GetCardByID(id uint) (*models.Card, error)
+	UpdateCard(card *models.Card) error
+	DeleteCard(id uint) error
 }
 
-func (r *CardRepository) CreateCard(card *models.Card) error {
-	return r.DB.Create(card).Error
+type cardRepository struct {
+	db *gorm.DB
 }
 
-func (r *CardRepository) GetCardsByListID(listID uint) ([]models.Card, error) {
+func NewCardRepository(db *gorm.DB) CardRepository {
+	return &cardRepository{db: db}
+}
+
+func (r *cardRepository) CreateCard(card *models.Card) error {
+	return r.db.Create(card).Error
+}
+
+func (r *cardRepository) GetCardsByListID(listID uint) ([]models.Card, error) {
 	var cards []models.Card
-	err := r.DB.Where("list_id = ?", listID).Order("position").Find(&cards).Error
+	err := r.db.Where("list_id = ?", listID).Order("position").Find(&cards).Error
 	return cards, err
 }
 
-func (r *CardRepository) GetCardByID(id uint) (*models.Card, error) {
+func (r *cardRepository) GetCardByID(id uint) (*models.Card, error) {
 	var card models.Card
-	if err := r.DB.First(&card, id).Error; err != nil {
+	if err := r.db.First(&card, id).Error; err != nil {
 		return nil, err
 	}
 	return &card, nil
 }
 
-func (r *CardRepository) UpdateCard(card *models.Card) error {
-	return r.DB.Save(card).Error
+func (r *cardRepository) UpdateCard(card *models.Card) error {
+	return r.db.Save(card).Error
 }
 
-func (r *CardRepository) DeleteCard(id uint) error {
-	return r.DB.Delete(&models.Card{}, id).Error
-}
-
-func NewCardRepository(db *gorm.DB) *CardRepository {
-	return &CardRepository{DB: db}
+func (r *cardRepository) DeleteCard(id uint) error {
+	return r.db.Delete(&models.Card{}, id).Error
 }

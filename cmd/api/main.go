@@ -71,11 +71,7 @@ func main() {
 
 	// GraphQL 設定
 	gqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &graph.Resolver{
-			BoardService: api.BoardService,
-			ListService:  api.ListService,
-			CardService:  api.CardService,
-		},
+		Resolvers: graph.NewResolverFromAPI(api),
 	}))
 	gqlSrv.AddTransport(transport.Options{})
 	gqlSrv.AddTransport(transport.GET{})

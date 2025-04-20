@@ -21,3 +21,15 @@ func NewResolver(boardService services.BoardService, listService services.ListSe
 		CardService:  cardService,
 	}
 }
+
+func NewResolverFromAPI(api interface {
+	BoardService() services.BoardService
+	ListService() services.ListService
+	CardService() services.CardService
+}) *Resolver {
+	return &Resolver{
+		BoardService: api.BoardService(),
+		ListService:  api.ListService(),
+		CardService:  api.CardService(),
+	}
+}

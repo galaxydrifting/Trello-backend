@@ -18,19 +18,31 @@ type Handler interface{}
 
 // API 包含所有的 handlers
 type API struct {
-	handlers     map[string]Handler
-	BoardService services.BoardService
-	ListService  services.ListService
-	CardService  services.CardService
+	handlers map[string]Handler
+	BoardSvc services.BoardService
+	ListSvc  services.ListService
+	CardSvc  services.CardService
+}
+
+func (a *API) BoardService() services.BoardService {
+	return a.BoardSvc
+}
+
+func (a *API) ListService() services.ListService {
+	return a.ListSvc
+}
+
+func (a *API) CardService() services.CardService {
+	return a.CardSvc
 }
 
 // NewAPI 建立新的 API 實例
 func NewAPI(authHandler *handlers.AuthHandler, boardService services.BoardService, listService services.ListService, cardService services.CardService) *API {
 	api := &API{
-		handlers:     make(map[string]Handler),
-		BoardService: boardService,
-		ListService:  listService,
-		CardService:  cardService,
+		handlers: make(map[string]Handler),
+		BoardSvc: boardService,
+		ListSvc:  listService,
+		CardSvc:  cardService,
 	}
 	api.RegisterHandler("auth", authHandler)
 	return api

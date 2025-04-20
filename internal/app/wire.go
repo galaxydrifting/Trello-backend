@@ -7,10 +7,10 @@ import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
 
+	"trello-backend/internal/graph"
 	"trello-backend/internal/handlers"
 	"trello-backend/internal/repositories"
 	"trello-backend/internal/services"
-	"trello-backend/internal/graph"
 )
 
 // Handler 介面定義所有 handler 必須實作的方法

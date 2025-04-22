@@ -6,6 +6,8 @@ package graph
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"strconv"
 	"trello-backend/graph/model"
 )
@@ -19,6 +21,12 @@ func ptrToStr(s *string) string {
 	} else {
 		return *s
 	}
+}
+
+// 取得 userID string from context
+func UserIDFromContext(ctx context.Context) (string, bool) {
+	uid, ok := ctx.Value(struct{ UserID string }{}).(string)
+	return uid, ok
 }
 
 // CreateBoard is the resolver for the createBoard field.
@@ -232,9 +240,13 @@ func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInp
 
 // Boards 查詢
 func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
-	boards := []*model.Board{}
-	// 這裡假設只有單一 board，實務可擴充
-	return boards, nil
+	userID, ok := UserIDFromContext(ctx)
+	if !ok {
+		return nil, errors.New("未驗證身份")
+	}
+	fmt.Println("userID:", userID) // 印出標準 UUID 字串格式
+	// ...你的查詢邏輯...
+	return []*model.Board{}, nil
 }
 
 // Board is the resolver for the board field.

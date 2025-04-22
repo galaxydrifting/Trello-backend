@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -49,6 +50,9 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 		}
 
 		c.Set("userID", userID)
+		// 新增：將 userID string 也存進 request context，方便 gqlgen resolver 直接取得
+		ctx := context.WithValue(c.Request.Context(), struct{ UserID string }{}, userID.String())
+		c.Request = c.Request.WithContext(ctx)
 		c.Next()
 	}
 }

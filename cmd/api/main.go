@@ -11,6 +11,7 @@ import (
 	"trello-backend/graph"
 	"trello-backend/internal/app"
 	"trello-backend/internal/config"
+	"trello-backend/internal/middlewares"
 	"trello-backend/internal/routes"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -83,7 +84,7 @@ func main() {
 	// GraphQL Playground 路由
 	engine.GET("/api/graphql/playground", gin.WrapH(playground.Handler("GraphQL playground", "/graphql/query")))
 	// GraphQL 查詢路由
-	engine.POST("/api/graphql/query", func(c *gin.Context) {
+	engine.POST("/api/graphql/query", middlewares.AuthMiddleware(cfg.JWTSecret), func(c *gin.Context) {
 		gqlSrv.ServeHTTP(c.Writer, c.Request)
 	})
 

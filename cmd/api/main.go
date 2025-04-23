@@ -82,7 +82,7 @@ func main() {
 	gqlSrv.Use(extension.AutomaticPersistedQuery{Cache: lru.New[string](100)})
 
 	// GraphQL Playground 路由
-	engine.GET("/api/graphql/playground", gin.WrapH(playground.Handler("GraphQL playground", "/graphql/query")))
+	engine.GET("/api/graphql/playground", gin.WrapH(playground.Handler("GraphQL playground", "/api/graphql/query")))
 	// GraphQL 查詢路由
 	engine.POST("/api/graphql/query", middlewares.AuthMiddleware(cfg.JWTSecret), func(c *gin.Context) {
 		gqlSrv.ServeHTTP(c.Writer, c.Request)

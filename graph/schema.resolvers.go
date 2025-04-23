@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strconv"
 	"trello-backend/graph/model"
+	"trello-backend/pkg/utils"
 )
 
 // 型別轉換工具
@@ -31,15 +32,19 @@ func UserIDFromContext(ctx context.Context) (string, bool) {
 
 // CreateBoard is the resolver for the createBoard field.
 func (r *mutationResolver) CreateBoard(ctx context.Context, input model.CreateBoardInput) (*model.Board, error) {
-	b, err := r.BoardService.CreateBoard(input.Name)
+	userID, ok := UserIDFromContext(ctx)
+	if !ok {
+		return nil, errors.New("未驗證身份")
+	}
+	b, err := r.BoardService.CreateBoard(input.Name, userID)
 	if err != nil {
 		return nil, err
 	}
 	return &model.Board{
 		ID:        strconv.FormatUint(uint64(b.ID), 10),
 		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: b.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 	}, nil
 }
 
@@ -60,8 +65,8 @@ func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBo
 	return &model.Board{
 		ID:        strconv.FormatUint(uint64(b.ID), 10),
 		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: b.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 	}, nil
 }
 
@@ -89,8 +94,8 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.CreateLis
 		ID:        strconv.FormatUint(uint64(l.ID), 10),
 		Name:      l.Name,
 		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
-		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: l.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: l.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(l.Position),
 	}, nil
 }
@@ -113,8 +118,8 @@ func (r *mutationResolver) UpdateList(ctx context.Context, input model.UpdateLis
 		ID:        strconv.FormatUint(uint64(l.ID), 10),
 		Name:      l.Name,
 		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
-		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: l.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: l.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(l.Position),
 	}, nil
 }
@@ -147,8 +152,8 @@ func (r *mutationResolver) MoveList(ctx context.Context, input model.MoveListInp
 		ID:        strconv.FormatUint(uint64(l.ID), 10),
 		Name:      l.Name,
 		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
-		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: l.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: l.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(l.Position),
 	}, nil
 }
@@ -168,8 +173,8 @@ func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCar
 		Title:     c.Title,
 		Content:   strToPtr(c.Content),
 		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(c.Position),
 	}, nil
 }
@@ -193,8 +198,8 @@ func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCar
 		Title:     c.Title,
 		Content:   strToPtr(c.Content),
 		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(c.Position),
 	}, nil
 }
@@ -232,8 +237,8 @@ func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInp
 		Title:     c.Title,
 		Content:   strToPtr(c.Content),
 		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(c.Position),
 	}, nil
 }
@@ -262,8 +267,8 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 	return &model.Board{
 		ID:        strconv.FormatUint(uint64(b.ID), 10),
 		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: b.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 	}, nil
 }
 
@@ -283,8 +288,8 @@ func (r *queryResolver) Lists(ctx context.Context, boardID string) ([]*model.Lis
 			ID:        strconv.FormatUint(uint64(l.ID), 10),
 			Name:      l.Name,
 			BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
-			CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			CreatedAt: l.CreatedAt.Format(utils.TimeFormat),
+			UpdatedAt: l.UpdatedAt.Format(utils.TimeFormat),
 			Position:  intToInt32(l.Position),
 		})
 	}
@@ -305,8 +310,8 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 		ID:        strconv.FormatUint(uint64(l.ID), 10),
 		Name:      l.Name,
 		BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
-		CreatedAt: l.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: l.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: l.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: l.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(l.Position),
 	}, nil
 }
@@ -328,8 +333,8 @@ func (r *queryResolver) Cards(ctx context.Context, listID string) ([]*model.Card
 			Title:     c.Title,
 			Content:   strToPtr(c.Content),
 			ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-			CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
+			UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
 			Position:  intToInt32(c.Position),
 		})
 	}
@@ -351,8 +356,8 @@ func (r *queryResolver) Card(ctx context.Context, id string) (*model.Card, error
 		Title:     c.Title,
 		Content:   strToPtr(c.Content),
 		ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-		CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt: c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(c.Position),
 	}, nil
 }

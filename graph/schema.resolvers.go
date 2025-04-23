@@ -6,8 +6,6 @@ package graph
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"strconv"
 	"trello-backend/graph/model"
 	"trello-backend/pkg/utils"
@@ -28,56 +26,6 @@ func ptrToStr(s *string) string {
 func UserIDFromContext(ctx context.Context) (string, bool) {
 	uid, ok := ctx.Value(struct{ UserID string }{}).(string)
 	return uid, ok
-}
-
-// CreateBoard is the resolver for the createBoard field.
-func (r *mutationResolver) CreateBoard(ctx context.Context, input model.CreateBoardInput) (*model.Board, error) {
-	userID, ok := UserIDFromContext(ctx)
-	if !ok {
-		return nil, errors.New("未驗證身份")
-	}
-	b, err := r.BoardService.CreateBoard(input.Name, userID)
-	if err != nil {
-		return nil, err
-	}
-	return &model.Board{
-		ID:        strconv.FormatUint(uint64(b.ID), 10),
-		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
-		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
-	}, nil
-}
-
-// UpdateBoard is the resolver for the updateBoard field.
-func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBoardInput) (*model.Board, error) {
-	id, err := strconv.ParseUint(input.ID, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	err = r.BoardService.UpdateBoard(uint(id), input.Name)
-	if err != nil {
-		return nil, err
-	}
-	b, err := r.BoardService.GetBoard(uint(id))
-	if err != nil {
-		return nil, err
-	}
-	return &model.Board{
-		ID:        strconv.FormatUint(uint64(b.ID), 10),
-		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
-		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
-	}, nil
-}
-
-// DeleteBoard is the resolver for the deleteBoard field.
-func (r *mutationResolver) DeleteBoard(ctx context.Context, id string) (bool, error) {
-	bid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return false, err
-	}
-	err = r.BoardService.DeleteBoard(uint(bid))
-	return err == nil, err
 }
 
 // CreateList is the resolver for the createList field.
@@ -240,35 +188,6 @@ func (r *mutationResolver) MoveCard(ctx context.Context, input model.MoveCardInp
 		CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
 		UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
 		Position:  intToInt32(c.Position),
-	}, nil
-}
-
-// Boards 查詢
-func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
-	userID, ok := UserIDFromContext(ctx)
-	if !ok {
-		return nil, errors.New("未驗證身份")
-	}
-	fmt.Println("userID:", userID) // 印出標準 UUID 字串格式
-	// ...你的查詢邏輯...
-	return []*model.Board{}, nil
-}
-
-// Board is the resolver for the board field.
-func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, error) {
-	boardID, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	b, err := r.BoardService.GetBoard(uint(boardID))
-	if err != nil {
-		return nil, err
-	}
-	return &model.Board{
-		ID:        strconv.FormatUint(uint64(b.ID), 10),
-		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
-		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 	}, nil
 }
 

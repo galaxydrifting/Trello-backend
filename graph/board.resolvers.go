@@ -29,15 +29,15 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.CreateBo
 
 func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBoardInput) (*model.Board, error) {
 	id, err := strconv.ParseUint(input.ID, 10, 64)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	err = r.BoardService.UpdateBoard(uint(id), input.Name)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	b, err := r.BoardService.GetBoard(uint(id))
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	return &model.Board{
@@ -50,7 +50,7 @@ func (r *mutationResolver) UpdateBoard(ctx context.Context, input model.UpdateBo
 
 func (r *mutationResolver) DeleteBoard(ctx context.Context, id string) (bool, error) {
 	bid, err := strconv.ParseUint(id, 10, 64)
-	if (err != nil) {
+	if err != nil {
 		return false, err
 	}
 	err = r.BoardService.DeleteBoard(uint(bid))
@@ -80,11 +80,11 @@ func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
 
 func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, error) {
 	boardID, err := strconv.ParseUint(id, 10, 64)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	b, err := r.BoardService.GetBoard(uint(boardID))
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	return &model.Board{

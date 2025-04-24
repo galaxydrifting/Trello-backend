@@ -10,6 +10,7 @@ type BoardService interface {
 	GetBoard(id uint) (*models.Board, error)
 	UpdateBoard(id uint, name string) error
 	DeleteBoard(id uint) error
+	GetBoardsByUserID(userID string) ([]models.Board, error)
 }
 
 type boardService struct {
@@ -43,4 +44,10 @@ func (s *boardService) UpdateBoard(id uint, name string) error {
 
 func (s *boardService) DeleteBoard(id uint) error {
 	return s.boardRepo.DeleteBoard(id)
+}
+
+func (s *boardService) GetBoardsByUserID(userID string) ([]models.Board, error) {
+	var boards []models.Board
+	err := s.boardRepo.FindBoardsByUserID(userID, &boards)
+	return boards, err
 }

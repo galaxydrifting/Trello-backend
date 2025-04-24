@@ -11,6 +11,7 @@ type BoardRepository interface {
 	GetBoardByID(id uint) (*models.Board, error)
 	UpdateBoard(board *models.Board) error
 	DeleteBoard(id uint) error
+	FindBoardsByUserID(userID string, boards *[]models.Board) error
 }
 
 type boardRepository struct {
@@ -39,4 +40,8 @@ func (r *boardRepository) UpdateBoard(board *models.Board) error {
 
 func (r *boardRepository) DeleteBoard(id uint) error {
 	return r.db.Delete(&models.Board{}, id).Error
+}
+
+func (r *boardRepository) FindBoardsByUserID(userID string, boards *[]models.Board) error {
+	return r.db.Preload("Lists.Cards").Where("user_id = ?", userID).Find(boards).Error
 }

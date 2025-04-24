@@ -3,7 +3,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"trello-backend/graph/model"
 	"trello-backend/pkg/utils"
@@ -63,9 +62,20 @@ func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
 	if !ok {
 		return nil, errors.New("未驗證身份")
 	}
-	fmt.Println("userID:", userID)
-	// ...你的查詢邏輯...
-	return []*model.Board{}, nil
+	boards, err := r.BoardService.GetBoardsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*model.Board, 0, len(boards))
+	for _, b := range boards {
+		result = append(result, &model.Board{
+			ID:        strconv.FormatUint(uint64(b.ID), 10),
+			Name:      b.Name,
+			CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+			UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
+		})
+	}
+	return result, nil
 }
 
 func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, error) {

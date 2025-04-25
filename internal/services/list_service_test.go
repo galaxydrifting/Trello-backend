@@ -35,7 +35,7 @@ func (m *MockListRepository) DeleteList(id uint) error {
 
 func TestListService_CreateList(t *testing.T) {
 	repo := new(MockListRepository)
-	service := ListService{ListRepo: repo}
+	service := NewListService(repo)
 	boardID := uint(1)
 	existing := []models.List{{Position: 0}, {Position: 1}}
 	repo.On("GetListsByBoardID", boardID).Return(existing, nil)
@@ -54,7 +54,7 @@ func TestListService_CreateList(t *testing.T) {
 
 func TestListService_GetLists(t *testing.T) {
 	repo := new(MockListRepository)
-	service := ListService{ListRepo: repo}
+	service := NewListService(repo)
 	boardID := uint(2)
 	existing := []models.List{{ID: 1}, {ID: 2}}
 	repo.On("GetListsByBoardID", boardID).Return(existing, nil)
@@ -68,7 +68,7 @@ func TestListService_GetLists(t *testing.T) {
 
 func TestListService_UpdateList(t *testing.T) {
 	repo := new(MockListRepository)
-	service := ListService{ListRepo: repo}
+	service := NewListService(repo)
 	id := uint(3)
 	old := &models.List{ID: id, Name: "Old"}
 	repo.On("GetListByID", id).Return(old, nil)
@@ -83,7 +83,7 @@ func TestListService_UpdateList(t *testing.T) {
 
 func TestListService_DeleteList(t *testing.T) {
 	repo := new(MockListRepository)
-	service := ListService{ListRepo: repo}
+	service := NewListService(repo)
 	id := uint(4)
 	repo.On("DeleteList", id).Return(nil)
 
@@ -95,7 +95,7 @@ func TestListService_DeleteList(t *testing.T) {
 
 func TestListService_MoveList_NoOp(t *testing.T) {
 	repo := new(MockListRepository)
-	service := ListService{ListRepo: repo}
+	service := NewListService(repo)
 	id := uint(5)
 	list := &models.List{ID: id, Position: 2}
 	repo.On("GetListByID", id).Return(list, nil)

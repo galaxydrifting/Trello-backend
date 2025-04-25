@@ -39,7 +39,7 @@ func (m *MockCardRepository) DeleteCard(id uint) error {
 
 func TestCardService_CreateCard(t *testing.T) {
 	repo := new(MockCardRepository)
-	service := CardService{CardRepo: repo}
+	service := NewCardService(repo)
 	listID := uint(1)
 	existing := []models.Card{{Position: 0}, {Position: 1}}
 	repo.On("GetCardsByListID", listID).Return(existing, nil)
@@ -56,7 +56,7 @@ func TestCardService_CreateCard(t *testing.T) {
 
 func TestCardService_GetCards(t *testing.T) {
 	repo := new(MockCardRepository)
-	service := CardService{CardRepo: repo}
+	service := NewCardService(repo)
 	listID := uint(2)
 	existing := []models.Card{{ID: 1}, {ID: 2}}
 	repo.On("GetCardsByListID", listID).Return(existing, nil)
@@ -70,7 +70,7 @@ func TestCardService_GetCards(t *testing.T) {
 
 func TestCardService_UpdateCard(t *testing.T) {
 	repo := new(MockCardRepository)
-	service := CardService{CardRepo: repo}
+	service := NewCardService(repo)
 	id := uint(3)
 	old := &models.Card{ID: id, Title: "Old"}
 	repo.On("GetCardByID", id).Return(old, nil)
@@ -85,7 +85,7 @@ func TestCardService_UpdateCard(t *testing.T) {
 
 func TestCardService_DeleteCard(t *testing.T) {
 	repo := new(MockCardRepository)
-	service := CardService{CardRepo: repo}
+	service := NewCardService(repo)
 	id := uint(4)
 	repo.On("DeleteCard", id).Return(nil)
 
@@ -97,7 +97,7 @@ func TestCardService_DeleteCard(t *testing.T) {
 
 func TestCardService_MoveCard_GetError(t *testing.T) {
 	repo := new(MockCardRepository)
-	service := CardService{CardRepo: repo}
+	service := NewCardService(repo)
 	id := uint(5)
 	repo.On("GetCardByID", id).Return(nil, errors.New("not found"))
 

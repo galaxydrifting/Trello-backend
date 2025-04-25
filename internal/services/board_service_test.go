@@ -33,14 +33,20 @@ func (m *MockBoardRepository) DeleteBoard(id uint) error {
 	return args.Error(0)
 }
 
+func (m *MockBoardRepository) FindBoardsByUserID(userID string, boards *[]models.Board) error {
+	args := m.Called(userID, boards)
+	return args.Error(0)
+}
+
 func TestBoardService_CreateBoard(t *testing.T) {
 	repo := new(MockBoardRepository)
-	service := BoardService{BoardRepo: repo}
+	service := NewBoardService(repo)
 
 	board := &models.Board{Name: "Test Board"}
 	repo.On("CreateBoard", board).Return(nil)
 
-	result, err := service.CreateBoard("Test Board")
+	// 新增 userID 參數，測試用空字串
+	result, err := service.CreateBoard("Test Board", "")
 
 	repo.AssertExpectations(t)
 	assert.NoError(t, err)
@@ -49,7 +55,7 @@ func TestBoardService_CreateBoard(t *testing.T) {
 
 func TestBoardService_GetBoard(t *testing.T) {
 	repo := new(MockBoardRepository)
-	service := BoardService{BoardRepo: repo}
+	service := NewBoardService(repo)
 
 	board := &models.Board{ID: 1, Name: "Test Board"}
 	repo.On("GetBoardByID", uint(1)).Return(board, nil)
@@ -64,7 +70,7 @@ func TestBoardService_GetBoard(t *testing.T) {
 
 func TestBoardService_UpdateBoard(t *testing.T) {
 	repo := new(MockBoardRepository)
-	service := BoardService{BoardRepo: repo}
+	service := NewBoardService(repo)
 	id := uint(10)
 	old := &models.Board{ID: id, Name: "OldName"}
 	repo.On("GetBoardByID", id).Return(old, nil)
@@ -79,7 +85,7 @@ func TestBoardService_UpdateBoard(t *testing.T) {
 
 func TestBoardService_DeleteBoard(t *testing.T) {
 	repo := new(MockBoardRepository)
-	service := BoardService{BoardRepo: repo}
+	service := NewBoardService(repo)
 	id := uint(20)
 	repo.On("DeleteBoard", id).Return(nil)
 

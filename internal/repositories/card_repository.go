@@ -13,6 +13,7 @@ type CardRepository interface {
 	UpdateCard(card *models.Card) error
 	DeleteCard(id uint) error
 	GetCardsByBoardID(boardID uint) ([]models.Card, error)
+	GetCardsByListIDs(listIDs []uint) (map[uint][]models.Card, error)
 }
 
 type cardRepository struct {
@@ -53,4 +54,20 @@ func (r *cardRepository) GetCardsByBoardID(boardID uint) ([]models.Card, error) 
 	var cards []models.Card
 	err := r.db.Where("board_id = ?", boardID).Order("position").Find(&cards).Error
 	return cards, err
+}
+
+func (r *cardRepository) GetCardsByListIDs(listIDs []uint) (map[uint][]models.Card, error) {
+	var cards []models.Card
+	if len(listIDs) == 0 {
+		return map[uint][]models.Card{}, nil
+	}
+	err := r.db.Where("list_id IN ?", listIDs).Order("position").Find(&cards).Error
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[uint][]models.Card)
+	for _, c := range cards {
+		result[c.ListID] = append(result[c.ListID], c)
+	}
+	return result, nil
 }

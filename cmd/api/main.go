@@ -85,6 +85,9 @@ func main() {
 	engine.GET("/api/graphql/playground", gin.WrapH(playground.Handler("GraphQL playground", "/api/graphql/query")))
 	// GraphQL 查詢路由
 	engine.POST("/api/graphql/query", middlewares.AuthMiddleware(cfg.JWTSecret), func(c *gin.Context) {
+		ctx := c.Request.Context()
+		ctx = graph.DataloaderMiddleware(api.CardService())(ctx)
+		c.Request = c.Request.WithContext(ctx)
 		gqlSrv.ServeHTTP(c.Writer, c.Request)
 	})
 

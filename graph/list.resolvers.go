@@ -2,9 +2,12 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"trello-backend/graph/model"
 	"trello-backend/pkg/utils"
+
+	"github.com/graph-gophers/dataloader"
 )
 
 // List 相關 resolver function
@@ -127,25 +130,18 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 
 // Cards is the resolver for the cards field.
 func (r *listResolver) Cards(ctx context.Context, obj *model.List) ([]*model.Card, error) {
-	listID, err := strconv.ParseUint(obj.ID, 10, 64)
+	loaders := For(ctx)
+	if loaders == nil {
+		return nil, errors.New("dataloader not found in context")
+	}
+	thunk := loaders.CardsByListID.Load(ctx, dataloader.StringKey(obj.ID))
+	result, err := thunk()
 	if err != nil {
 		return nil, err
 	}
-	cards, err := r.CardService.GetCards(uint(listID))
-	if err != nil {
-		return nil, err
+	cards, ok := result.([]*model.Card)
+	if !ok {
+		return nil, errors.New("unexpected dataloader result type")
 	}
-	result := make([]*model.Card, 0, len(cards))
-	for _, c := range cards {
-		result = append(result, &model.Card{
-			ID:        strconv.FormatUint(uint64(c.ID), 10),
-			Title:     c.Title,
-			Content:   strToPtr(c.Content),
-			ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-			CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
-			UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
-			Position:  int32(c.Position),
-		})
-	}
-	return result, nil
+	return cards, nil
 }

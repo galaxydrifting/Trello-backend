@@ -40,6 +40,10 @@ func (m *MockCardRepository) DeleteCard(id uint) error {
 	args := m.Called(id)
 	return args.Error(0)
 }
+func (m *MockCardRepository) GetCardsByListIDs(listIDs []uint) (map[uint][]models.Card, error) {
+	args := m.Called(listIDs)
+	return args.Get(0).(map[uint][]models.Card), args.Error(1)
+}
 
 func TestCardService_CreateCard(t *testing.T) {
 	repo := new(MockCardRepository)

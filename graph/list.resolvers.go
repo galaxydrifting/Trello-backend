@@ -124,3 +124,9 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 		Position:  int32(l.Position),
 	}, nil
 }
+
+// Cards is the resolver for the cards field.
+func (r *listResolver) Cards(ctx context.Context, obj *model.List) ([]*model.Card, error) {
+	// 已有的 List.Cards resolver 已在 list.resolvers.go 實作，這裡刪除
+	return nil, nil
+}

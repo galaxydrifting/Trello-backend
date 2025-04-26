@@ -120,3 +120,9 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 		Lists:     lists,
 	}, nil
 }
+
+// Lists is the resolver for the lists field.
+func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
+	// 已有的 Board.Lists resolver 已在 board.resolvers.go 實作，這裡刪除
+	return nil, nil
+}

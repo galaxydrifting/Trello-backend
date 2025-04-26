@@ -6,20 +6,7 @@ package graph
 
 import (
 	"context"
-	"trello-backend/graph/model"
 )
-
-// Lists is the resolver for the lists field.
-func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
-	// 已有的 Board.Lists resolver 已在 board.resolvers.go 實作，這裡刪除
-	return nil, nil
-}
-
-// Cards is the resolver for the cards field.
-func (r *listResolver) Cards(ctx context.Context, obj *model.List) ([]*model.Card, error) {
-	// 已有的 List.Cards resolver 已在 list.resolvers.go 實作，這裡刪除
-	return nil, nil
-}
 
 // Board returns BoardResolver implementation.
 func (r *Resolver) Board() BoardResolver { return &boardResolver{r} }

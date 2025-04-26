@@ -12,6 +12,7 @@ type CardService interface {
 	UpdateCard(id uint, title, content string) error
 	DeleteCard(id uint) error
 	MoveCard(id, targetListID uint, newPosition int) error
+	GetCardsByBoardID(boardID uint) ([]models.Card, error) // 新增
 }
 
 type cardService struct {
@@ -99,4 +100,8 @@ func (s *cardService) MoveCard(id, targetListID uint, newPosition int) error {
 	}
 	card.Position = newPosition
 	return s.cardRepo.UpdateCard(card)
+}
+
+func (s *cardService) GetCardsByBoardID(boardID uint) ([]models.Card, error) {
+	return s.cardRepo.GetCardsByBoardID(boardID)
 }

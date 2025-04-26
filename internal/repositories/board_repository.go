@@ -28,7 +28,7 @@ func (r *boardRepository) CreateBoard(board *models.Board) error {
 
 func (r *boardRepository) GetBoardByID(id uint) (*models.Board, error) {
 	var board models.Board
-	if err := r.db.Preload("Lists.Cards").First(&board, id).Error; err != nil {
+	if err := r.db.First(&board, id).Error; err != nil {
 		return nil, err
 	}
 	return &board, nil
@@ -43,5 +43,5 @@ func (r *boardRepository) DeleteBoard(id uint) error {
 }
 
 func (r *boardRepository) FindBoardsByUserID(userID string, boards *[]models.Board) error {
-	return r.db.Preload("Lists.Cards").Where("user_id = ?", userID).Find(boards).Error
+	return r.db.Where("user_id = ?", userID).Find(boards).Error
 }

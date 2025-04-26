@@ -87,42 +87,34 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 	if err != nil {
 		return nil, err
 	}
-	// 將 lists 及 cards 一併轉換
-	lists := make([]*model.List, 0, len(b.Lists))
-	for _, l := range b.Lists {
-		cards := make([]*model.Card, 0, len(l.Cards))
-		for _, c := range l.Cards {
-			cards = append(cards, &model.Card{
-				ID:        strconv.FormatUint(uint64(c.ID), 10),
-				Title:     c.Title,
-				Content:   strToPtr(c.Content),
-				ListID:    strconv.FormatUint(uint64(c.ListID), 10),
-				CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
-				UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
-				Position:  int32(c.Position),
-			})
-		}
-		lists = append(lists, &model.List{
+	return &model.Board{
+		ID:        strconv.FormatUint(uint64(b.ID), 10),
+		Name:      b.Name,
+		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
+	}, nil
+}
+
+// Lists is the resolver for the lists field.
+func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
+	boardID, err := strconv.ParseUint(obj.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	lists, err := r.ListService.GetLists(uint(boardID))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*model.List, 0, len(lists))
+	for _, l := range lists {
+		result = append(result, &model.List{
 			ID:        strconv.FormatUint(uint64(l.ID), 10),
 			Name:      l.Name,
 			BoardID:   strconv.FormatUint(uint64(l.BoardID), 10),
 			CreatedAt: l.CreatedAt.Format(utils.TimeFormat),
 			UpdatedAt: l.UpdatedAt.Format(utils.TimeFormat),
 			Position:  int32(l.Position),
-			Cards:     cards,
 		})
 	}
-	return &model.Board{
-		ID:        strconv.FormatUint(uint64(b.ID), 10),
-		Name:      b.Name,
-		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
-		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
-		Lists:     lists,
-	}, nil
-}
-
-// Lists is the resolver for the lists field.
-func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
-	// 已有的 Board.Lists resolver 已在 board.resolvers.go 實作，這裡刪除
-	return nil, nil
+	return result, nil
 }

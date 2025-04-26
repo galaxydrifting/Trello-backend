@@ -127,6 +127,25 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 
 // Cards is the resolver for the cards field.
 func (r *listResolver) Cards(ctx context.Context, obj *model.List) ([]*model.Card, error) {
-	// 已有的 List.Cards resolver 已在 list.resolvers.go 實作，這裡刪除
-	return nil, nil
+	listID, err := strconv.ParseUint(obj.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	cards, err := r.CardService.GetCards(uint(listID))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*model.Card, 0, len(cards))
+	for _, c := range cards {
+		result = append(result, &model.Card{
+			ID:        strconv.FormatUint(uint64(c.ID), 10),
+			Title:     c.Title,
+			Content:   strToPtr(c.Content),
+			ListID:    strconv.FormatUint(uint64(c.ListID), 10),
+			CreatedAt: c.CreatedAt.Format(utils.TimeFormat),
+			UpdatedAt: c.UpdatedAt.Format(utils.TimeFormat),
+			Position:  int32(c.Position),
+		})
+	}
+	return result, nil
 }

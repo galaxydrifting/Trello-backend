@@ -153,3 +153,11 @@ models:
     model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
+  Board:
+    fields:
+      lists:
+        resolver: true
+  List:
+    fields:
+      cards:
+        resolver: true

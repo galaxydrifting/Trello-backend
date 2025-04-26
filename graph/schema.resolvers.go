@@ -6,11 +6,45 @@ package graph
 
 import (
 	"context"
+	"trello-backend/graph/model"
 )
 
-// List/Card 相關 resolver 已移至 list.resolvers.go, card.resolvers.go
+// Lists is the resolver for the lists field.
+func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
+	// 已有的 Board.Lists resolver 已在 board.resolvers.go 實作，這裡刪除
+	return nil, nil
+}
 
-// 型別轉換工具
+// Cards is the resolver for the cards field.
+func (r *listResolver) Cards(ctx context.Context, obj *model.List) ([]*model.Card, error) {
+	// 已有的 List.Cards resolver 已在 list.resolvers.go 實作，這裡刪除
+	return nil, nil
+}
+
+// Board returns BoardResolver implementation.
+func (r *Resolver) Board() BoardResolver { return &boardResolver{r} }
+
+// List returns ListResolver implementation.
+func (r *Resolver) List() ListResolver { return &listResolver{r} }
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
+type boardResolver struct{ *Resolver }
+type listResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+
 func strToPtr(s string) *string { return &s }
 func ptrToStr(s *string) string {
 	if s == nil {
@@ -19,18 +53,7 @@ func ptrToStr(s *string) string {
 		return *s
 	}
 }
-
-// 取得 userID string from context
 func UserIDFromContext(ctx context.Context) (string, bool) {
 	uid, ok := ctx.Value(struct{ UserID string }{}).(string)
 	return uid, ok
 }
-
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
-
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }

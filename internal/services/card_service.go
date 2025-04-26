@@ -6,7 +6,7 @@ import (
 )
 
 type CardService interface {
-	CreateCard(listID uint, title, content string) (*models.Card, error)
+	CreateCard(listID uint, boardID uint, title, content string) (*models.Card, error)
 	GetCards(listID uint) ([]models.Card, error)
 	GetCardByID(id uint) (*models.Card, error)
 	UpdateCard(id uint, title, content string) error
@@ -22,13 +22,13 @@ func NewCardService(repo repositories.CardRepository) CardService {
 	return &cardService{cardRepo: repo}
 }
 
-func (s *cardService) CreateCard(listID uint, title, content string) (*models.Card, error) {
+func (s *cardService) CreateCard(listID uint, boardID uint, title, content string) (*models.Card, error) {
 	cards, err := s.cardRepo.GetCardsByListID(listID)
 	if err != nil {
 		return nil, err
 	}
 	position := len(cards)
-	card := &models.Card{ListID: listID, Title: title, Content: content, Position: position}
+	card := &models.Card{ListID: listID, BoardID: boardID, Title: title, Content: content, Position: position}
 	if err := s.cardRepo.CreateCard(card); err != nil {
 		return nil, err
 	}

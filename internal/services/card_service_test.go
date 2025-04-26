@@ -41,13 +41,14 @@ func TestCardService_CreateCard(t *testing.T) {
 	repo := new(MockCardRepository)
 	service := NewCardService(repo)
 	listID := uint(1)
+	boardID := uint(2)
 	existing := []models.Card{{Position: 0}, {Position: 1}}
 	repo.On("GetCardsByListID", listID).Return(existing, nil)
 	repo.On("CreateCard", mock.MatchedBy(func(c *models.Card) bool {
 		return c.ListID == listID && c.Title == "Title" && c.Content == "Content" && c.Position == len(existing)
 	})).Return(nil)
 
-	card, err := service.CreateCard(listID, "Title", "Content")
+	card, err := service.CreateCard(listID, boardID, "Title", "Content")
 
 	repo.AssertExpectations(t)
 	assert.NoError(t, err)

@@ -26,6 +26,7 @@ type CreateBoardInput struct {
 
 type CreateCardInput struct {
 	ListID  string  `json:"listId"`
+	BoardID *string `json:"boardId"`
 	Title   string  `json:"title"`
 	Content *string `json:"content,omitempty"`
 }

@@ -14,7 +14,15 @@ func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCar
 	if err != nil {
 		return nil, err
 	}
-	c, err := r.CardService.CreateCard(uint(lid), input.Title, ptrToStr(input.Content))
+	boardID := uint(0)
+	if input.BoardID != nil {
+		bid, err := strconv.ParseUint(*input.BoardID, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		boardID = uint(bid)
+	}
+	c, err := r.CardService.CreateCard(uint(lid), boardID, input.Title, ptrToStr(input.Content))
 	if err != nil {
 		return nil, err
 	}

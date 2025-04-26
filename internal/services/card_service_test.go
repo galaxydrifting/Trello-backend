@@ -21,6 +21,10 @@ func (m *MockCardRepository) GetCardsByListID(listID uint) ([]models.Card, error
 	args := m.Called(listID)
 	return args.Get(0).([]models.Card), args.Error(1)
 }
+func (m *MockCardRepository) GetCardsByBoardID(boardID uint) ([]models.Card, error) {
+	args := m.Called(boardID)
+	return args.Get(0).([]models.Card), args.Error(1)
+}
 func (m *MockCardRepository) GetCardByID(id uint) (*models.Card, error) {
 	args := m.Called(id)
 	if args.Get(0) == nil {

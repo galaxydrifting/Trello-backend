@@ -12,6 +12,7 @@ type CardRepository interface {
 	GetCardByID(id uint) (*models.Card, error)
 	UpdateCard(card *models.Card) error
 	DeleteCard(id uint) error
+	GetCardsByBoardID(boardID uint) ([]models.Card, error)
 }
 
 type cardRepository struct {
@@ -46,4 +47,10 @@ func (r *cardRepository) UpdateCard(card *models.Card) error {
 
 func (r *cardRepository) DeleteCard(id uint) error {
 	return r.db.Delete(&models.Card{}, id).Error
+}
+
+func (r *cardRepository) GetCardsByBoardID(boardID uint) ([]models.Card, error) {
+	var cards []models.Card
+	err := r.db.Where("board_id = ?", boardID).Order("position").Find(&cards).Error
+	return cards, err
 }

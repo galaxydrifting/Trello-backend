@@ -11,7 +11,7 @@ type Board struct {
 	UserID    string `gorm:"type:uuid;not null"` // 新增，關聯 User
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Lists     []List `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Lists     []List `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 // List represents a list in a Kanban board
@@ -22,7 +22,7 @@ type List struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Position  int    `gorm:"not null;default:0"`
-	Cards     []Card `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Cards     []Card `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 // Card represents a card in a Kanban list

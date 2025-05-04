@@ -54,6 +54,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Lists     func(childComplexity int) int
 		Name      func(childComplexity int) int
+		Position  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
 
@@ -175,6 +176,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Board.Name(childComplexity), true
+
+	case "Board.position":
+		if e.complexity.Board.Position == nil {
+			break
+		}
+
+		return e.complexity.Board.Position(childComplexity), true
 
 	case "Board.updatedAt":
 		if e.complexity.Board.UpdatedAt == nil {
@@ -1191,6 +1199,50 @@ func (ec *executionContext) fieldContext_Board_name(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Board_position(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_position(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Position, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Board_position(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Board",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Board_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Board_createdAt(ctx, field)
 	if err != nil {
@@ -2011,6 +2063,8 @@ func (ec *executionContext) fieldContext_Mutation_createBoard(ctx context.Contex
 				return ec.fieldContext_Board_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Board_name(ctx, field)
+			case "position":
+				return ec.fieldContext_Board_position(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Board_createdAt(ctx, field)
 			case "updatedAt":
@@ -2078,6 +2132,8 @@ func (ec *executionContext) fieldContext_Mutation_updateBoard(ctx context.Contex
 				return ec.fieldContext_Board_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Board_name(ctx, field)
+			case "position":
+				return ec.fieldContext_Board_position(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Board_createdAt(ctx, field)
 			case "updatedAt":
@@ -2736,6 +2792,8 @@ func (ec *executionContext) fieldContext_Query_boards(_ context.Context, field g
 				return ec.fieldContext_Board_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Board_name(ctx, field)
+			case "position":
+				return ec.fieldContext_Board_position(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Board_createdAt(ctx, field)
 			case "updatedAt":
@@ -2789,6 +2847,8 @@ func (ec *executionContext) fieldContext_Query_board(ctx context.Context, field 
 				return ec.fieldContext_Board_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Board_name(ctx, field)
+			case "position":
+				return ec.fieldContext_Board_position(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Board_createdAt(ctx, field)
 			case "updatedAt":
@@ -5180,7 +5240,7 @@ func (ec *executionContext) unmarshalInputCreateBoardInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name"}
+	fieldsInOrder := [...]string{"name", "position"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5194,6 +5254,13 @@ func (ec *executionContext) unmarshalInputCreateBoardInput(ctx context.Context, 
 				return it, err
 			}
 			it.Name = data
+		case "position":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("position"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Position = data
 		}
 	}
 
@@ -5207,7 +5274,7 @@ func (ec *executionContext) unmarshalInputCreateCardInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"listId", "title", "content"}
+	fieldsInOrder := [...]string{"listId", "title", "content", "boardId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5235,6 +5302,13 @@ func (ec *executionContext) unmarshalInputCreateCardInput(ctx context.Context, o
 				return it, err
 			}
 			it.Content = data
+		case "boardId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("boardId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BoardID = data
 		}
 	}
 
@@ -5485,6 +5559,11 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "name":
 			out.Values[i] = ec._Board_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "position":
+			out.Values[i] = ec._Board_position(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -6913,6 +6992,22 @@ func (ec *executionContext) marshalOCard2ᚖtrelloᚑbackendᚋgraphᚋmodelᚐC
 		return graphql.Null
 	}
 	return ec._Card(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint32(ctx context.Context, v any) (*int32, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt32(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint32(ctx context.Context, sel ast.SelectionSet, v *int32) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt32(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOList2ᚖtrelloᚑbackendᚋgraphᚋmodelᚐList(ctx context.Context, sel ast.SelectionSet, v *model.List) graphql.Marshaler {

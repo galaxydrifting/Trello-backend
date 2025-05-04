@@ -6,7 +6,7 @@ import (
 )
 
 type BoardService interface {
-	CreateBoard(name string, userID string) (*models.Board, error)
+	CreateBoard(name string, userID string, position int) (*models.Board, error)
 	GetBoard(id uint) (*models.Board, error)
 	UpdateBoard(id uint, name string) error
 	DeleteBoard(id uint) error
@@ -21,8 +21,8 @@ func NewBoardService(repo repositories.BoardRepository) BoardService {
 	return &boardService{boardRepo: repo}
 }
 
-func (s *boardService) CreateBoard(name string, userID string) (*models.Board, error) {
-	board := &models.Board{Name: name, UserID: userID}
+func (s *boardService) CreateBoard(name string, userID string, position int) (*models.Board, error) {
+	board := &models.Board{Name: name, UserID: userID, Position: position}
 	if err := s.boardRepo.CreateBoard(board); err != nil {
 		return nil, err
 	}

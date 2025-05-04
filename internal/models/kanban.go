@@ -9,6 +9,7 @@ type Board struct {
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"not null"`
 	UserID    string `gorm:"type:uuid;not null"` // 新增，關聯 User
+	Position  int    `gorm:"not null;default:0"` // 新增 position 欄位
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Lists     []List `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

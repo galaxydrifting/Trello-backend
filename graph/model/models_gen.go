@@ -5,6 +5,7 @@ package model
 type Board struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`
+	Position  int32   `json:"position"`
 	CreatedAt string  `json:"createdAt"`
 	UpdatedAt string  `json:"updatedAt"`
 	Lists     []*List `json:"lists"`
@@ -21,14 +22,15 @@ type Card struct {
 }
 
 type CreateBoardInput struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	Position *int32 `json:"position,omitempty"`
 }
 
 type CreateCardInput struct {
 	ListID  string  `json:"listId"`
-	BoardID *string `json:"boardId"`
 	Title   string  `json:"title"`
 	Content *string `json:"content,omitempty"`
+	BoardID string  `json:"boardId"`
 }
 
 type CreateListInput struct {

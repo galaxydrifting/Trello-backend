@@ -15,13 +15,18 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.CreateBo
 	if !ok {
 		return nil, errors.New("未驗證身份")
 	}
-	b, err := r.BoardService.CreateBoard(input.Name, userID)
+	position := int32(0)
+	if input.Position != nil {
+		position = *input.Position
+	}
+	b, err := r.BoardService.CreateBoard(input.Name, userID, int(position))
 	if err != nil {
 		return nil, err
 	}
 	return &model.Board{
 		ID:        strconv.FormatUint(uint64(b.ID), 10),
 		Name:      b.Name,
+		Position:  int32(b.Position),
 		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
 		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 	}, nil
@@ -71,6 +76,7 @@ func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
 		result = append(result, &model.Board{
 			ID:        strconv.FormatUint(uint64(b.ID), 10),
 			Name:      b.Name,
+			Position:  int32(b.Position),
 			CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
 			UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 		})
@@ -90,6 +96,7 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 	return &model.Board{
 		ID:        strconv.FormatUint(uint64(b.ID), 10),
 		Name:      b.Name,
+		Position:  int32(b.Position),
 		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
 		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
 	}, nil

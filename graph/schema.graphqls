@@ -7,6 +7,7 @@
 type Board {
   id: ID!
   name: String!
+  position: Int! # 新增 position 欄位，預設 0
   createdAt: String!
   updatedAt: String!
   lists: [List!]!
@@ -47,6 +48,7 @@ type Query {
 
 input CreateBoardInput {
   name: String!
+  position: Int
 }
 
 input UpdateBoardInput {
@@ -73,6 +75,7 @@ input CreateCardInput {
   listId: ID!
   title: String!
   content: String
+  boardId: ID! # 新增 boardId 欄位
 }
 
 input UpdateCardInput {

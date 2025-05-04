@@ -15,8 +15,8 @@ func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCar
 		return nil, err
 	}
 	boardID := uint(0)
-	if input.BoardID != nil {
-		bid, err := strconv.ParseUint(*input.BoardID, 10, 64)
+	if input.BoardID != "" {
+		bid, err := strconv.ParseUint(input.BoardID, 10, 64)
 		if err != nil {
 			return nil, err
 		}

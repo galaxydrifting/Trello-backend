@@ -56,6 +56,11 @@ input UpdateBoardInput {
   name: String!
 }
 
+input MoveBoardInput {
+  id: ID!
+  newPosition: Int!
+}
+
 input CreateListInput {
   boardId: ID!
   name: String!
@@ -96,6 +101,7 @@ type Mutation {
   createBoard(input: CreateBoardInput!): Board!
   updateBoard(input: UpdateBoardInput!): Board!
   deleteBoard(id: ID!): Boolean!
+  moveBoard(input: MoveBoardInput!): Board!
 
   createList(input: CreateListInput!): List!
   updateList(input: UpdateListInput!): List!

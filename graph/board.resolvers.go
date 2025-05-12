@@ -62,6 +62,74 @@ func (r *mutationResolver) DeleteBoard(ctx context.Context, id string) (bool, er
 	return err == nil, err
 }
 
+func (r *mutationResolver) MoveBoard(ctx context.Context, input model.MoveBoardInput) (*model.Board, error) {
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	userID, ok := UserIDFromContext(ctx)
+	if !ok {
+		return nil, errors.New("未驗證身份")
+	}
+	boards, err := r.BoardService.GetBoardsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	var oldPos int
+	for _, b := range boards {
+		if b.ID == uint(id) {
+			oldPos = b.Position
+			break
+		}
+	}
+	if int(input.NewPosition) == oldPos {
+		b, err := r.BoardService.GetBoard(uint(id))
+		if err != nil {
+			return nil, err
+		}
+		return &model.Board{
+			ID:        strconv.FormatUint(uint64(b.ID), 10),
+			Name:      b.Name,
+			Position:  int32(b.Position),
+			CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+			UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
+		}, nil
+	}
+	// 更新其他 board 的 position
+	for i := range boards {
+		if boards[i].ID == uint(id) {
+			continue
+		}
+		if oldPos < int(input.NewPosition) {
+			if boards[i].Position > oldPos && boards[i].Position <= int(input.NewPosition) {
+				boards[i].Position--
+				r.BoardService.UpdateBoardPosition(boards[i].ID, boards[i].Position)
+			}
+		} else {
+			if boards[i].Position >= int(input.NewPosition) && boards[i].Position < oldPos {
+				boards[i].Position++
+				r.BoardService.UpdateBoardPosition(boards[i].ID, boards[i].Position)
+			}
+		}
+	}
+	b, err := r.BoardService.GetBoard(uint(id))
+	if err != nil {
+		return nil, err
+	}
+	b.Position = int(input.NewPosition)
+	err = r.BoardService.UpdateBoardPosition(b.ID, b.Position)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Board{
+		ID:        strconv.FormatUint(uint64(b.ID), 10),
+		Name:      b.Name,
+		Position:  int32(b.Position),
+		CreatedAt: b.CreatedAt.Format(utils.TimeFormat),
+		UpdatedAt: b.UpdatedAt.Format(utils.TimeFormat),
+	}, nil
+}
+
 func (r *queryResolver) Boards(ctx context.Context) ([]*model.Board, error) {
 	userID, ok := UserIDFromContext(ctx)
 	if !ok {

@@ -85,6 +85,7 @@ type ComplexityRoot struct {
 		DeleteBoard func(childComplexity int, id string) int
 		DeleteCard  func(childComplexity int, id string) int
 		DeleteList  func(childComplexity int, id string) int
+		MoveBoard   func(childComplexity int, input model.MoveBoardInput) int
 		MoveCard    func(childComplexity int, input model.MoveCardInput) int
 		MoveList    func(childComplexity int, input model.MoveListInput) int
 		UpdateBoard func(childComplexity int, input model.UpdateBoardInput) int
@@ -112,6 +113,7 @@ type MutationResolver interface {
 	CreateBoard(ctx context.Context, input model.CreateBoardInput) (*model.Board, error)
 	UpdateBoard(ctx context.Context, input model.UpdateBoardInput) (*model.Board, error)
 	DeleteBoard(ctx context.Context, id string) (bool, error)
+	MoveBoard(ctx context.Context, input model.MoveBoardInput) (*model.Board, error)
 	CreateList(ctx context.Context, input model.CreateListInput) (*model.List, error)
 	UpdateList(ctx context.Context, input model.UpdateListInput) (*model.List, error)
 	DeleteList(ctx context.Context, id string) (bool, error)
@@ -361,6 +363,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteList(childComplexity, args["id"].(string)), true
 
+	case "Mutation.moveBoard":
+		if e.complexity.Mutation.MoveBoard == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_moveBoard_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MoveBoard(childComplexity, args["input"].(model.MoveBoardInput)), true
+
 	case "Mutation.moveCard":
 		if e.complexity.Mutation.MoveCard == nil {
 			break
@@ -499,6 +513,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateBoardInput,
 		ec.unmarshalInputCreateCardInput,
 		ec.unmarshalInputCreateListInput,
+		ec.unmarshalInputMoveBoardInput,
 		ec.unmarshalInputMoveCardInput,
 		ec.unmarshalInputMoveListInput,
 		ec.unmarshalInputUpdateBoardInput,
@@ -755,6 +770,29 @@ func (ec *executionContext) field_Mutation_deleteList_argsID(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_moveBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_moveBoard_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_moveBoard_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.MoveBoardInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNMoveBoardInput2trelloᚑbackendᚋgraphᚋmodelᚐMoveBoardInput(ctx, tmp)
+	}
+
+	var zeroVal model.MoveBoardInput
 	return zeroVal, nil
 }
 
@@ -2207,6 +2245,75 @@ func (ec *executionContext) fieldContext_Mutation_deleteBoard(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteBoard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_moveBoard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_moveBoard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MoveBoard(rctx, fc.Args["input"].(model.MoveBoardInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Board)
+	fc.Result = res
+	return ec.marshalNBoard2ᚖtrelloᚑbackendᚋgraphᚋmodelᚐBoard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_moveBoard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Board_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Board_name(ctx, field)
+			case "position":
+				return ec.fieldContext_Board_position(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
+			case "lists":
+				return ec.fieldContext_Board_lists(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_moveBoard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5349,6 +5456,40 @@ func (ec *executionContext) unmarshalInputCreateListInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMoveBoardInput(ctx context.Context, obj any) (model.MoveBoardInput, error) {
+	var it model.MoveBoardInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "newPosition"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "newPosition":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newPosition"))
+			data, err := ec.unmarshalNInt2int32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NewPosition = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputMoveCardInput(ctx context.Context, obj any) (model.MoveCardInput, error) {
 	var it model.MoveCardInput
 	asMap := map[string]any{}
@@ -5838,6 +5979,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteBoard":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteBoard(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "moveBoard":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_moveBoard(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -6661,6 +6809,11 @@ func (ec *executionContext) marshalNList2ᚖtrelloᚑbackendᚋgraphᚋmodelᚐL
 		return graphql.Null
 	}
 	return ec._List(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNMoveBoardInput2trelloᚑbackendᚋgraphᚋmodelᚐMoveBoardInput(ctx context.Context, v any) (model.MoveBoardInput, error) {
+	res, err := ec.unmarshalInputMoveBoardInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNMoveCardInput2trelloᚑbackendᚋgraphᚋmodelᚐMoveCardInput(ctx context.Context, v any) (model.MoveCardInput, error) {

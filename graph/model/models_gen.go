@@ -48,6 +48,11 @@ type List struct {
 	Cards     []*Card `json:"cards"`
 }
 
+type MoveBoardInput struct {
+	ID          string `json:"id"`
+	NewPosition int32  `json:"newPosition"`
+}
+
 type MoveCardInput struct {
 	ID           string `json:"id"`
 	TargetListID string `json:"targetListId"`

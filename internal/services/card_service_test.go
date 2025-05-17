@@ -50,10 +50,15 @@ func TestCardService_CreateCard(t *testing.T) {
 	service := NewCardService(repo)
 	listID := uint(1)
 	boardID := uint(2)
-	existing := []models.Card{{Position: 0}, {Position: 1}}
+	existing := []models.Card{{ID: 10, Position: 0}, {ID: 11, Position: 1}}
 	repo.On("GetCardsByListID", listID).Return(existing, nil)
+	// 期望 UpdateCard 會被呼叫兩次，且 position 變成 1, 2
+	repo.On("UpdateCard", mock.MatchedBy(func(c *models.Card) bool {
+		return (c.ID == 10 && c.Position == 1) || (c.ID == 11 && c.Position == 2)
+	})).Return(nil).Twice()
+	// 新卡片 position = 0
 	repo.On("CreateCard", mock.MatchedBy(func(c *models.Card) bool {
-		return c.ListID == listID && c.Title == "Title" && c.Content == "Content" && c.Position == len(existing)
+		return c.ListID == listID && c.Title == "Title" && c.Content == "Content" && c.Position == 0
 	})).Return(nil)
 
 	card, err := service.CreateCard(listID, boardID, "Title", "Content")
@@ -61,6 +66,7 @@ func TestCardService_CreateCard(t *testing.T) {
 	repo.AssertExpectations(t)
 	assert.NoError(t, err)
 	assert.Equal(t, listID, card.ListID)
+	assert.Equal(t, 0, card.Position)
 }
 
 func TestCardService_GetCards(t *testing.T) {

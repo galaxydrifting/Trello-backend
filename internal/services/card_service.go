@@ -25,12 +25,20 @@ func NewCardService(repo repositories.CardRepository) CardService {
 }
 
 func (s *cardService) CreateCard(listID uint, boardID uint, title, content string) (*models.Card, error) {
+	// 取得該 list 目前所有卡片
 	cards, err := s.cardRepo.GetCardsByListID(listID)
 	if err != nil {
 		return nil, err
 	}
-	position := len(cards)
-	card := &models.Card{ListID: listID, BoardID: boardID, Title: title, Content: content, Position: position}
+	// 所有卡片 position +1
+	for i := range cards {
+		cards[i].Position++
+		if err := s.cardRepo.UpdateCard(&cards[i]); err != nil {
+			return nil, err
+		}
+	}
+	// 新卡片 position = 0
+	card := &models.Card{ListID: listID, BoardID: boardID, Title: title, Content: content, Position: 0}
 	if err := s.cardRepo.CreateCard(card); err != nil {
 		return nil, err
 	}

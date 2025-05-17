@@ -42,11 +42,11 @@ func TestBoardService_CreateBoard(t *testing.T) {
 	repo := new(MockBoardRepository)
 	service := NewBoardService(repo)
 
-	board := &models.Board{Name: "Test Board"}
+	board := &models.Board{Name: "Test Board", UserID: "", Position: 0}
 	repo.On("CreateBoard", board).Return(nil)
 
-	// 新增 userID 參數，測試用空字串
-	result, err := service.CreateBoard("Test Board", "")
+	// 新增 userID 參數，測試用空字串，position 預設 0
+	result, err := service.CreateBoard("Test Board", "", 0)
 
 	repo.AssertExpectations(t)
 	assert.NoError(t, err)

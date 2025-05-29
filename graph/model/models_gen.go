@@ -16,6 +16,7 @@ type Card struct {
 	Title     string  `json:"title"`
 	Content   *string `json:"content,omitempty"`
 	ListID    string  `json:"listId"`
+	BoardID   string  `json:"boardId"`
 	CreatedAt string  `json:"createdAt"`
 	UpdatedAt string  `json:"updatedAt"`
 	Position  int32   `json:"position"`

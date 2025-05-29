@@ -59,6 +59,7 @@ type ComplexityRoot struct {
 	}
 
 	Card struct {
+		BoardID   func(childComplexity int) int
 		Content   func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -192,6 +193,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Board.UpdatedAt(childComplexity), true
+
+	case "Card.boardId":
+		if e.complexity.Card.BoardID == nil {
+			break
+		}
+
+		return e.complexity.Card.BoardID(childComplexity), true
 
 	case "Card.content":
 		if e.complexity.Card.Content == nil {
@@ -1602,6 +1610,50 @@ func (ec *executionContext) fieldContext_Card_listId(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Card_boardId(ctx context.Context, field graphql.CollectedField, obj *model.Card) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Card_boardId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BoardID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Card_boardId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Card",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Card_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Card) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Card_createdAt(ctx, field)
 	if err != nil {
@@ -2045,6 +2097,8 @@ func (ec *executionContext) fieldContext_List_cards(_ context.Context, field gra
 				return ec.fieldContext_Card_content(ctx, field)
 			case "listId":
 				return ec.fieldContext_Card_listId(ctx, field)
+			case "boardId":
+				return ec.fieldContext_Card_boardId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Card_createdAt(ctx, field)
 			case "updatedAt":
@@ -2635,6 +2689,8 @@ func (ec *executionContext) fieldContext_Mutation_createCard(ctx context.Context
 				return ec.fieldContext_Card_content(ctx, field)
 			case "listId":
 				return ec.fieldContext_Card_listId(ctx, field)
+			case "boardId":
+				return ec.fieldContext_Card_boardId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Card_createdAt(ctx, field)
 			case "updatedAt":
@@ -2706,6 +2762,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCard(ctx context.Context
 				return ec.fieldContext_Card_content(ctx, field)
 			case "listId":
 				return ec.fieldContext_Card_listId(ctx, field)
+			case "boardId":
+				return ec.fieldContext_Card_boardId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Card_createdAt(ctx, field)
 			case "updatedAt":
@@ -2832,6 +2890,8 @@ func (ec *executionContext) fieldContext_Mutation_moveCard(ctx context.Context, 
 				return ec.fieldContext_Card_content(ctx, field)
 			case "listId":
 				return ec.fieldContext_Card_listId(ctx, field)
+			case "boardId":
+				return ec.fieldContext_Card_boardId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Card_createdAt(ctx, field)
 			case "updatedAt":
@@ -3166,6 +3226,8 @@ func (ec *executionContext) fieldContext_Query_cards(ctx context.Context, field 
 				return ec.fieldContext_Card_content(ctx, field)
 			case "listId":
 				return ec.fieldContext_Card_listId(ctx, field)
+			case "boardId":
+				return ec.fieldContext_Card_boardId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Card_createdAt(ctx, field)
 			case "updatedAt":
@@ -3234,6 +3296,8 @@ func (ec *executionContext) fieldContext_Query_card(ctx context.Context, field g
 				return ec.fieldContext_Card_content(ctx, field)
 			case "listId":
 				return ec.fieldContext_Card_listId(ctx, field)
+			case "boardId":
+				return ec.fieldContext_Card_boardId(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Card_createdAt(ctx, field)
 			case "updatedAt":
@@ -5802,6 +5866,11 @@ func (ec *executionContext) _Card(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Card_content(ctx, field, obj)
 		case "listId":
 			out.Values[i] = ec._Card_listId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "boardId":
+			out.Values[i] = ec._Card_boardId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

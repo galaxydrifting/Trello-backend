@@ -28,6 +28,7 @@ type Card {
   title: String!
   content: String
   listId: ID!
+  boardId: ID! # 新增 boardId 欄位
   createdAt: String!
   updatedAt: String!
   position: Int!

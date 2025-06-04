@@ -12,8 +12,8 @@ import (
 )
 
 type AuthService interface {
-	Register(req models.RegisterRequest) (string, error)
-	Login(req models.LoginRequest) (string, error)
+	Register(req models.RegisterRequest) (models.AuthResponse, error)
+	Login(req models.LoginRequest) (models.AuthResponse, error)
 	ChangePassword(userID uuid.UUID, req models.ChangePasswordRequest) error
 }
 
@@ -29,10 +29,10 @@ func NewAuthService(userRepo repositories.UserRepository, jwtSecret string) Auth
 	}
 }
 
-func (s *authService) Register(req models.RegisterRequest) (string, error) {
+func (s *authService) Register(req models.RegisterRequest) (models.AuthResponse, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", errors.New("密碼加密失敗")
+		return models.AuthResponse{}, errors.New("密碼加密失敗")
 	}
 
 	user := models.User{
@@ -43,23 +43,41 @@ func (s *authService) Register(req models.RegisterRequest) (string, error) {
 	}
 
 	if err := s.userRepo.Create(&user); err != nil {
-		return "", errors.New("使用者建立失敗")
+		return models.AuthResponse{}, errors.New("使用者建立失敗")
 	}
 
-	return utils.GenerateToken(user.ID, s.jwtSecret)
+	token, err := utils.GenerateToken(user.ID, s.jwtSecret)
+	if err != nil {
+		return models.AuthResponse{}, errors.New("Token 產生失敗")
+	}
+
+	return models.AuthResponse{
+		Token: token,
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }
 
-func (s *authService) Login(req models.LoginRequest) (string, error) {
+func (s *authService) Login(req models.LoginRequest) (models.AuthResponse, error) {
 	user, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
-		return "", errors.New("帳號或密碼錯誤")
+		return models.AuthResponse{}, errors.New("帳號或密碼錯誤")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-		return "", errors.New("帳號或密碼錯誤")
+		return models.AuthResponse{}, errors.New("帳號或密碼錯誤")
 	}
 
-	return utils.GenerateToken(user.ID, s.jwtSecret)
+	token, err := utils.GenerateToken(user.ID, s.jwtSecret)
+	if err != nil {
+		return models.AuthResponse{}, errors.New("Token 產生失敗")
+	}
+
+	return models.AuthResponse{
+		Token: token,
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }
 
 func (s *authService) ChangePassword(userID uuid.UUID, req models.ChangePasswordRequest) error {

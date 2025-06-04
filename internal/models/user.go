@@ -33,8 +33,18 @@ type LoginRequest struct {
 }
 
 // LoginResponse 登入回應
-type LoginResponse struct {
+// Deprecated: 請改用 AuthResponse
+// type LoginResponse struct {
+// 	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+// }
+
+// AuthResponse 登入/註冊回應
+// 回傳 token、name、email
+// swagger:model
+type AuthResponse struct {
 	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+	Name  string `json:"name" example:"王小明"`
+	Email string `json:"email" example:"user@example.com"`
 }
 
 // ChangePasswordRequest 變更密碼請求

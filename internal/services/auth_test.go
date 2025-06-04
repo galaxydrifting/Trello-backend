@@ -48,10 +48,12 @@ func TestAuthService_Register(t *testing.T) {
 
 	mockRepo.On("Create", mock.Anything).Return(nil)
 
-	token, err := authService.Register(req)
+	resp, err := authService.Register(req)
 
 	assert.NoError(t, err)
-	assert.NotEmpty(t, token)
+	assert.NotEmpty(t, resp.Token)
+	assert.Equal(t, req.Name, resp.Name)
+	assert.Equal(t, req.Email, resp.Email)
 	mockRepo.AssertExpectations(t)
 }
 
@@ -64,6 +66,7 @@ func TestAuthService_Login(t *testing.T) {
 	user := &models.User{
 		ID:           uuid.New(),
 		Email:        "test@example.com",
+		Name:         "Test User",
 		PasswordHash: string(hashedPassword),
 	}
 
@@ -74,10 +77,12 @@ func TestAuthService_Login(t *testing.T) {
 		Password: "password123",
 	}
 
-	token, err := authService.Login(req)
+	resp, err := authService.Login(req)
 
 	assert.NoError(t, err)
-	assert.NotEmpty(t, token)
+	assert.NotEmpty(t, resp.Token)
+	assert.Equal(t, user.Name, resp.Name)
+	assert.Equal(t, user.Email, resp.Email)
 	mockRepo.AssertExpectations(t)
 }
 

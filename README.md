@@ -66,3 +66,21 @@ gotestsum
 ```bash
 go test -v ./...
 ```
+
+### 安裝 golangci-lint
+
+如尚未安裝，請執行：
+
+```bash
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+```
+
+### 執行 lint 檢查
+
+於專案根目錄執行：
+
+```bash
+golangci-lint run ./...
+```
+
+> 建議將此流程納入開發習慣，或於 CI/CD pipeline 自動檢查。

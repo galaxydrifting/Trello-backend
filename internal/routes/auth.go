@@ -26,6 +26,7 @@ func (r *Router) setupAuthRoutes(api *gin.RouterGroup) {
 		protected.Use(middlewares.AuthMiddleware(r.jwtSecret))
 		{
 			protected.POST("/change-password", authHandler.ChangePassword)
+			protected.GET("/me", authHandler.GetProfile)
 		}
 	}
 }

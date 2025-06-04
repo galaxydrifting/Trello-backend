@@ -59,6 +59,15 @@ definitions:
     - name
     - password
     type: object
+  models.UserProfileResponse:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      name:
+        example: 王小明
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -126,6 +135,25 @@ paths:
           schema:
             $ref: '#/definitions/models.APIResponse'
       summary: 使用者登入
+      tags:
+      - 認證
+  /auth/me:
+    get:
+      description: 取得目前登入使用者的 name、email
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 使用者資訊
+          schema:
+            $ref: '#/definitions/models.UserProfileResponse'
+        "401":
+          description: 認證失敗
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: 取得目前使用者資訊
       tags:
       - 認證
   /auth/ping:

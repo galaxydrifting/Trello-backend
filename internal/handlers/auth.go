@@ -108,6 +108,29 @@ func (h *AuthHandler) ChangePassword(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse{})
 }
 
+// GetProfile godoc
+// @Summary 取得目前使用者資訊
+// @Description 取得目前登入使用者的 name、email
+// @Tags 認證
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.UserProfileResponse "使用者資訊"
+// @Failure 401 {object} models.APIResponse "認證失敗"
+// @Router /auth/me [get]
+func (h *AuthHandler) GetProfile(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.APIResponse{Error: "未認證"})
+		return
+	}
+	resp, err := h.authSvc.GetProfile(userID.(uuid.UUID))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, models.APIResponse{Error: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 // Ping godoc
 // @Summary 測試 API 是否正常運作
 // @Description 回傳簡單的 pong 回應

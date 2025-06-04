@@ -15,6 +15,7 @@ type AuthService interface {
 	Register(req models.RegisterRequest) (models.AuthResponse, error)
 	Login(req models.LoginRequest) (models.AuthResponse, error)
 	ChangePassword(userID uuid.UUID, req models.ChangePasswordRequest) error
+	GetProfile(userID uuid.UUID) (models.UserProfileResponse, error)
 }
 
 type authService struct {
@@ -96,4 +97,15 @@ func (s *authService) ChangePassword(userID uuid.UUID, req models.ChangePassword
 	}
 
 	return s.userRepo.UpdatePassword(userID, string(newHashedPassword))
+}
+
+func (s *authService) GetProfile(userID uuid.UUID) (models.UserProfileResponse, error) {
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return models.UserProfileResponse{}, errors.New("使用者不存在")
+	}
+	return models.UserProfileResponse{
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }

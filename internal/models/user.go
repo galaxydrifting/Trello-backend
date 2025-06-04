@@ -52,3 +52,12 @@ type ChangePasswordRequest struct {
 	OldPassword string `json:"oldPassword" binding:"required" example:"oldpass123"`
 	NewPassword string `json:"newPassword" binding:"required" example:"newpass123"`
 }
+
+// UserProfileResponse 取得個人資訊回應
+// swagger:model
+// 用於 /auth/me
+// 只回傳 name, email
+type UserProfileResponse struct {
+	Name  string `json:"name" example:"王小明"`
+	Email string `json:"email" example:"user@example.com"`
+}

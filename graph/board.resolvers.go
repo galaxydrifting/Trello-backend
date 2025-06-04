@@ -103,12 +103,16 @@ func (r *mutationResolver) MoveBoard(ctx context.Context, input model.MoveBoardI
 		if oldPos < int(input.NewPosition) {
 			if boards[i].Position > oldPos && boards[i].Position <= int(input.NewPosition) {
 				boards[i].Position--
-				r.BoardService.UpdateBoardPosition(boards[i].ID, boards[i].Position)
+				if err := r.BoardService.UpdateBoardPosition(boards[i].ID, boards[i].Position); err != nil {
+					return nil, err
+				}
 			}
 		} else {
 			if boards[i].Position >= int(input.NewPosition) && boards[i].Position < oldPos {
 				boards[i].Position++
-				r.BoardService.UpdateBoardPosition(boards[i].ID, boards[i].Position)
+				if err := r.BoardService.UpdateBoardPosition(boards[i].ID, boards[i].Position); err != nil {
+					return nil, err
+				}
 			}
 		}
 	}

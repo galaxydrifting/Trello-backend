@@ -66,7 +66,3 @@ gotestsum
 ```bash
 go test -v ./...
 ```
-
-## 其他
-- 歡迎貢獻，請見 [CONTRIBUTING.md]（如有）
-- 授權條款：MIT（如適用）

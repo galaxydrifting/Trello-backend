@@ -1,4 +1,4 @@
-# trello-backend
+# Trello-Backend
 
 ## 專案簡介
 本專案為 Trello 類型的看板系統後端，支援「看板 > 清單 > 卡片」的階層式管理，並具備卡片拖拉、CRUD 操作、用戶認證等功能。
